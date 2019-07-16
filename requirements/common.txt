@@ -1,0 +1,10 @@
+Flask
+flask-sqlalchemy
+sqlalchemy_mptt
+flask-migrate
+flak-mail
+pytest
+coverage
+python-dotenv
+psycopg2
+
