@@ -1,6 +1,8 @@
 Flask
 flask-sqlalchemy
 sqlalchemy_mptt
+flask-login
+itsdangerous
 flask-migrate
 flak-mail
 pytest
