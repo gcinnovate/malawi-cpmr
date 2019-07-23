@@ -19,7 +19,7 @@ $ . env/bin/activate
 
 $ pip install -r requirements.txt
 
-3. Configuration
+4. Configuration
 The configurations for the CPMR application are made using environment variables.
 Refer to the config.py file for the environment variables to set.
 
@@ -29,16 +29,16 @@ $ export FLASK_CONFIG=default
 
 $ export DEV_DATABASE_URL=postgresql://postgres:postgres@localhost/cpmr
 
-4. Migrate database
+5. Migrate database
 
 $ flask db upgrade
 
-5. Populate database with locations and police stations
+6. Populate database with locations and police stations
 
 $ flask initdb
 This runs the initdb command in the cpmr.py application script to initialize database with some data
 
-6. Running the application
+7. Running the application
 
 $ flask run
 
