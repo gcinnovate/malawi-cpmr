@@ -59,6 +59,7 @@ def initdb():
     click.echo("Database Initialization Starting.............!")
 
     db.session.add(LocationTree(name='Malawi Administrative Divisions'))
+    db.session.commit()
     # Add country
     db.session.add(Location(name='Malawi', code=id_generator(), tree_id=1))  # Country
     # Add the regions
