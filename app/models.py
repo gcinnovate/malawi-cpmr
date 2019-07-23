@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 # from sqlalchemy.ext.declarative import declared_attr
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app
+from flask import current_app, url_for
 from flask_login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
 
@@ -54,6 +54,14 @@ class FlowData(db.Model, TimeStampMixin):
     msisdn = db.Column(db.String(), index=True)
     month = db.Column(db.String(), index=True)
     values = db.Column(JSONB)
+
+    def to_json(self):
+        json_flowdata = {
+            'url': url_for('api.get_flowdata', id=self.id),
+            'region': self.region.name,
+            'district': self.district.name,
+        }
+        return json_flowdata
 
 
 class Indicator(db.Model):
