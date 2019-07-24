@@ -32,5 +32,5 @@ def save_flowdata(request_args, request_json, districts, pstations):
 
         db.session.add(FlowData(
             msisdn=msisdn, district=district_id, region=region_id, station=police_station,
-            report_type=report_type, month=month_str, values=flowdata))
+            report_type=report_type, month=month_str, year=year, values=flowdata))
         db.session.commit()

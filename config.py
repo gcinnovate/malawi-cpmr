@@ -68,3 +68,11 @@ indicators = {
 
     ]
 }
+
+report_aggregate_inidicators = {
+    'pvsu': [
+        'physicalviolence', 'suicide', 'defilement', 'rape', 'indecentassault', 'humantrafficking',
+        'kidnapping', 'sexualoffences', 'maritalconflict', 'childneglect', 'economicabuse'
+    ],
+    'cvsu': []
+}
