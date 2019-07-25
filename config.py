@@ -47,7 +47,7 @@ config = {
     'default': DevelopmentConfig
 }
 
-indicators = {
+INDICATORS = {
     'pvsu': [
         'month', 'physicalviolence', 'suicide', 'defilement', 'rape', 'indecentassault',
         'humantrafficking', 'kidnapping', 'sexualoffences', 'maritalconflict', 'childneglect',
@@ -69,7 +69,7 @@ indicators = {
     ]
 }
 
-report_aggregate_inidicators = {
+REPORT_AGGREGATE_INIDICATORS = {
     'pvsu': [
         'physicalviolence', 'suicide', 'defilement', 'rape', 'indecentassault', 'humantrafficking',
         'kidnapping', 'sexualoffences', 'maritalconflict', 'childneglect', 'economicabuse'

@@ -1,4 +1,4 @@
-from .. import db, celery, indicators
+from .. import db, celery, INDICATORS
 from ..models import FlowData
 from ..utils import get_indicators_from_rapidpro_results
 from datetime import datetime
@@ -15,7 +15,7 @@ def save_flowdata(request_args, request_json, districts, pstations):
     district = request_args.get('district')
 
     flowdata = get_indicators_from_rapidpro_results(
-        request_json['results'], indicators, report_type)
+        request_json['results'], INDICATORS, report_type)
     month = flowdata.pop('month')
     if month == 'December' or MONTHS_DICT[month] > datetime.now().month:
         year = datetime.now().year - 1

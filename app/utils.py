@@ -1,10 +1,10 @@
-from . import redis_client, db, report_aggregate_inidicators
+from . import redis_client, db, REPORT_AGGREGATE_INIDICATORS
 
 
 def get_indicators_from_rapidpro_results(results_json, indicator_conf={}, report_type=None):
     report_type_indicators = indicator_conf.get(report_type, [])
     # we shall have to sum up the aggregate inidicators to get a total
-    aggregate_indicators = report_aggregate_inidicators.get(report_type, [])
+    aggregate_indicators = REPORT_AGGREGATE_INIDICATORS.get(report_type, [])
     flow_inidicators = {}
     total_cases = 0
 

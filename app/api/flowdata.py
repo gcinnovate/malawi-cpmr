@@ -1,5 +1,5 @@
 from flask import jsonify, request
-# from .. import db, indicators
+# from .. import db, INDICATORS
 # from ..models import FlowData, Permission
 from . import api
 # from .decorators import permission_required
