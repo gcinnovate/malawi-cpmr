@@ -76,3 +76,38 @@ REPORT_AGGREGATE_INIDICATORS = {
     ],
     'cvsu': []
 }
+
+# The following are used for generating dummy data
+
+INDICATOR_CATEGORY_MAPPING = {
+    'pvsu': {
+        'physicalviolence': ['boys', 'girls', 'men', 'women'],
+        'suicide': ['boys', 'girls', 'men', 'women'],
+        'defilement': ['girls'],
+        'rape': ['girls', 'women'],
+        'indecentassault': ['boys', 'girls', 'men', 'women'],
+        'humantrafficking': ['boys', 'girls', 'men', 'women'],
+        'kidnapping': ['boys', 'girls', 'men', 'women'],
+        'sexualoffences': ['boys', 'girls', 'men', 'women'],
+        'maritalconflict': ['boys', 'girls', 'men', 'women'],
+        'childneglect': ['boys', 'girls', 'men', 'women'],
+        'economicabuse': ['boys', 'girls', 'men', 'women']
+    },
+    'cvsu': {
+    }
+}
+
+# the guide random generation
+INDICATOR_THRESHOLD = {
+    'physicalviolence': 50,
+    'suicide': 10,
+    'defilement': 20,
+    'rape': 10,
+    'indecentassault': 50,
+    'humantrafficking': 15,
+    'kidnapping': 10,
+    'sexualoffences': 40,
+    'maritalconflict': 30,
+    'childneglect': 20,
+    'economicabuse': 60,
+}

@@ -6,7 +6,8 @@ import click
 from dotenv import load_dotenv
 from flask_migrate import Migrate, upgrade
 from app import create_app, db, redis_client
-from app.models import Location, LocationTree, PoliceStation, User, Role
+from app.models import Location, LocationTree, PoliceStation, User, Role, FlowData
+from datetime import datetime
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
@@ -111,6 +112,43 @@ def initdb():
 
     db.session.commit()
     click.echo("Database Initialization Complete!")
+
+
+@app.cli.command("load_test_data")
+@click.option('--report', '-r', default='pvsu')
+@click.option('--start-year', '-s', default=2016)
+@click.option('--end-year', '-e', default=2020)
+def load_test_data(report, start_year, end_year):
+    from config import INDICATOR_CATEGORY_MAPPING, INDICATOR_THRESHOLD
+    print(report)
+    police_stations = PoliceStation.query.all()
+    year = datetime.now().year
+    for y in range(start_year, end_year):
+        for m in range(1, 13):
+            if y == year and m > datetime.now().month - 1:
+                continue
+            click.echo("{0}-{1:02}".format(y, m))
+            for p in police_stations:
+                district_id = p.district_id
+                region_id = Location.query.filter_by(id=district_id).first().parent_id
+                month_str = "{0}-{1:02}".format(y, m)
+                total_cases = 0
+                values = {}
+                for k, v in INDICATOR_CATEGORY_MAPPING.get(report).items():
+                    indcators_total = 0
+                    for ind in v:
+                        field = "{0}_{1}".format(ind, k)
+                        val = random.choice(range(INDICATOR_THRESHOLD[k]))
+                        values[field] = val
+                        indcators_total += val
+                    values[k] = indcators_total
+                    total_cases += indcators_total
+                values['total_cases'] = total_cases
+                db.session.add(FlowData(
+                    region=region_id, district=district_id, station=p.id, month=month_str,
+                    year=y, report_type=report, values=values))
+                click.echo(values)
+            db.session.commit()
 
 
 @app.cli.command()
