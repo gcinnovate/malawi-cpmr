@@ -41,6 +41,8 @@ class PoliceStation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     district_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
     name = db.Column(db.String(64), index=True)
+    longitude = db.Column(db.String())
+    latitude = db.Column(db.String())
 
 
 class FlowData(db.Model, TimeStampMixin):
