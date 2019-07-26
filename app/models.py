@@ -56,7 +56,7 @@ class FlowData(db.Model, TimeStampMixin):
     msisdn = db.Column(db.String(), index=True)
     month = db.Column(db.String(), index=True)
     year = db.Column(db.Integer, index=True)
-    values = db.Column(JSONB)
+    values = db.Column(JSONB, index=True)
 
     def to_json(self):
         json_flowdata = {
