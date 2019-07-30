@@ -30,7 +30,14 @@ def save_flowdata(request_args, request_json, districts, pstations):
         region_id = ids['parent_id']
         police_station = pstations.get(station)
 
-        db.session.add(FlowData(
-            msisdn=msisdn, district=district_id, region=region_id, station=police_station,
-            report_type=report_type, month=month_str, year=year, values=flowdata))
+        value_record = FlowData.query.filter_by(
+            year=year, month=month_str, station=police_station, report_type=report_type).first()
+
+        if value_record:
+            value_record.values = flowdata
+            value_record.msisdn = msisdn
+        else:
+            db.session.add(FlowData(
+                msisdn=msisdn, district=district_id, region=region_id, station=police_station,
+                report_type=report_type, month=month_str, year=year, values=flowdata))
         db.session.commit()
