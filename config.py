@@ -1,4 +1,5 @@
 import os
+import random
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -58,14 +59,21 @@ INDICATORS = {
         'girls_rape', 'women_rape',
         'boys_indecentassault', 'girls_indecentassault', 'men_indecentassault', 'women_indecentassault',
         'boys_humantrafficking', 'girls_humantrafficking', 'men_humantrafficking', 'women_humantrafficking',
-        'boys_kidnapping', 'girls_kidnapping', 'kidnapping', 'men_kidnapping',
+        'boys_kidnapping', 'girls_kidnapping', 'men_kidnapping', 'women_kidnapping',
         'boys_sexualoffences', 'girls_sexualoffences', 'men_sexualoffences', 'women_sexualoffences',
         'boys_maritalconflict', 'girls_maritalconflict', 'men_maritalconflict', 'women_maritalconflict',
         'boys_childneglect', 'girls_childneglect',
         'boys_economicabuse', 'girls_economicabuse', 'men_economicabuse', 'women_economicabuse',
     ],
-    'cvsu': [
-
+    'diversion': [
+        'month',
+        'arrested', 'divertedatpolice', 'takentocourt', 'bailed', 'releasedfreely', 'releasedin24hrs',
+        'boys_arrested', 'girls_arrested',
+        'boys_divertedatpolice', 'girls_divertedatpolice',
+        'boys_takentocourt', 'girls_takentocourt',
+        'boys_bailed', 'girls_bailed',
+        'boys_releasedfreely', 'girls_releasedfreely',
+        'boys_releasedin24hrs', 'girls_releasedin24hrs',
     ]
 }
 
@@ -74,7 +82,10 @@ REPORT_AGGREGATE_INIDICATORS = {
         'physicalviolence', 'suicide', 'defilement', 'rape', 'indecentassault', 'humantrafficking',
         'kidnapping', 'sexualoffences', 'maritalconflict', 'childneglect', 'economicabuse'
     ],
-    'cvsu': []
+    'diversion': [
+        'arrested', 'divertedatpolice', 'takentocourt', 'bailed',
+        'releasedfreely', 'releasedin24hrs'
+    ]
 }
 
 # The following are used for generating dummy data
@@ -93,21 +104,33 @@ INDICATOR_CATEGORY_MAPPING = {
         'childneglect': ['boys', 'girls', 'men', 'women'],
         'economicabuse': ['boys', 'girls', 'men', 'women']
     },
-    'cvsu': {
+    'diversion': {
+        'arrested': ['boys', 'girls'],
+        'divertedatpolice': ['boys', 'girls'],
+        'takentocourt': ['boys', 'girls'],
+        'bailed': ['boys', 'girls'],
+        'releasedfreely': ['boys', 'girls'],
+        'releasedin24hrs': ['boys', 'girls'],
     }
 }
 
 # the guide random generation
 INDICATOR_THRESHOLD = {
-    'physicalviolence': 50,
-    'suicide': 10,
-    'defilement': 20,
-    'rape': 10,
-    'indecentassault': 50,
-    'humantrafficking': 15,
-    'kidnapping': 10,
-    'sexualoffences': 40,
-    'maritalconflict': 30,
-    'childneglect': 20,
-    'economicabuse': 60,
+    'physicalviolence': random.randint(0, 100),
+    'suicide': random.randint(0, 20),
+    'defilement': random.randint(0, 40),
+    'rape': random.randint(0, 20),
+    'indecentassault': random.randint(0, 100),
+    'humantrafficking': random.randint(0, 30),
+    'kidnapping': random.randint(0, 60),
+    'sexualoffences': random.randint(0, 80),
+    'maritalconflict': random.randint(0, 60),
+    'childneglect': random.randint(0, 40),
+    'economicabuse': random.randint(0, 120),
+    'arrested': 1000,
+    'divertedatpolice': 200,
+    'bailed': 100,
+    'takentocourt': 80,
+    'releasedfreely': 40,
+    'releasedin24hrs': 30
 }
