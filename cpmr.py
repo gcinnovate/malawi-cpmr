@@ -1,5 +1,5 @@
 import os
-import sys
+# import sys
 import string
 import random
 import click
@@ -8,6 +8,9 @@ from flask_migrate import Migrate, upgrade
 from app import create_app, db, redis_client
 from app.models import Location, LocationTree, PoliceStation, User, Role, FlowData
 from datetime import datetime
+from flask import current_app
+from sqlalchemy.sql import text
+from getpass import getpass
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
@@ -158,6 +161,27 @@ def deploy():
     upgrade()
 
 
-@app.cli.command()
+@app.cli.command("create-user")
 def createuser():
-    pass
+    username = input("Enter Username: ")
+    email = input("Enter Email: ")
+    password = getpass()
+    cpass = getpass("Confirm Password: ")
+    assert password == cpass
+    u = User(username=username, email=email)
+    u.password = cpass
+    db.session.add(u)
+    db.session.commit()
+    u.confirmed = True
+    db.session.commit()
+    click.echo("User added!")
+
+
+@app.cli.command("create-views")
+def create_views():
+    with current_app.open_resource('../views.sql') as f:
+        # print(f.read())
+        click.echo("Gonna create views")
+        db.session.execute(text(f.read().decode('utf8')))
+        db.session.commit()
+        click.echo("Done creating views")

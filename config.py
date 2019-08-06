@@ -73,7 +73,7 @@ INDICATORS = {
         'boys_takentocourt', 'girls_takentocourt',
         'boys_bailed', 'girls_bailed',
         'boys_releasedfreely', 'girls_releasedfreely',
-        'boys_releasedin24hrs', 'girls_releasedin24hrs',
+        'boys_releasedin48hrs', 'girls_releasedin48hrs',
     ]
 }
 
@@ -84,7 +84,7 @@ REPORT_AGGREGATE_INIDICATORS = {
     ],
     'diversion': [
         'arrested', 'divertedatpolice', 'takentocourt', 'bailed',
-        'releasedfreely', 'releasedin24hrs'
+        'releasedfreely', 'releasedin48hrs'
     ]
 }
 
@@ -110,7 +110,7 @@ INDICATOR_CATEGORY_MAPPING = {
         'takentocourt': ['boys', 'girls'],
         'bailed': ['boys', 'girls'],
         'releasedfreely': ['boys', 'girls'],
-        'releasedin24hrs': ['boys', 'girls'],
+        'releasedin48hrs': ['boys', 'girls'],
     }
 }
 
@@ -132,5 +132,5 @@ INDICATOR_THRESHOLD = {
     'bailed': 100,
     'takentocourt': 80,
     'releasedfreely': 40,
-    'releasedin24hrs': 30
+    'releasedin48hrs': 30
 }
