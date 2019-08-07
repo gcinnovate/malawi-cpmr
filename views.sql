@@ -28,15 +28,6 @@ CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
     WHERE
         a.report_type = 'pvsu';
 
-CREATE VIEW cases_by_police_station AS
-    SELECT flow_data_pvsu_view.police_station,
-        sum(flow_data_pvsu_view.total_cases) AS total,
-        get_long(flow_data_pvsu_view.police_station::text) AS long,
-        get_lat(flow_data_pvsu_view.police_station::text) AS lat
-    FROM flow_data_pvsu_view
-    GROUP BY flow_data_pvsu_view.police_station
-     ORDER BY flow_data_pvsu_view.police_station;
-
 DROP VIEW IF EXISTS flow_data_diversion_view;
 CREATE OR REPLACE VIEW flow_data_diversion_view  AS
     SELECT
@@ -95,3 +86,13 @@ $$
         RETURN '';
     END;
 $$ language 'plpgsql';
+
+CREATE VIEW cases_by_police_station AS
+    SELECT flow_data_pvsu_view.police_station,
+        sum(flow_data_pvsu_view.total_cases) AS total,
+        get_long(flow_data_pvsu_view.police_station::text) AS long,
+        get_lat(flow_data_pvsu_view.police_station::text) AS lat
+    FROM flow_data_pvsu_view
+    GROUP BY flow_data_pvsu_view.police_station
+     ORDER BY flow_data_pvsu_view.police_station;
+
