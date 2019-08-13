@@ -45,6 +45,15 @@ class PoliceStation(db.Model):
     latitude = db.Column(db.String())
 
 
+class JusticeCourt(db.Model):
+    __tablename__ = 'justice_courts'
+    id = db.Column(db.Integer, primary_key=True)
+    district_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
+    name = db.Column(db.String(64), index=True)
+    longitude = db.Column(db.String())
+    latitude = db.Column(db.String())
+
+
 class FlowData(db.Model, TimeStampMixin):
     """To hold flow data from RapidPro"""
     __tablename__ = 'flow_data'
@@ -52,6 +61,7 @@ class FlowData(db.Model, TimeStampMixin):
     region = db.Column(db.Integer, db.ForeignKey('locations.id'))
     district = db.Column(db.Integer, db.ForeignKey('locations.id'))
     station = db.Column(db.Integer, db.ForeignKey('police_stations.id'))
+    court = db.Column(db.Integer, db.ForeignKey('justice_courts.id'))
     report_type = db.Column(db.String(), index=True)
     msisdn = db.Column(db.String(), index=True)
     month = db.Column(db.String(), index=True)

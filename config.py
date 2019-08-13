@@ -74,6 +74,19 @@ INDICATORS = {
         'boys_bailed', 'girls_bailed',
         'boys_releasedfreely', 'girls_releasedfreely',
         'boys_releasedin48hrs', 'girls_releasedin48hrs',
+    ],
+    'ncjf': [
+        'month',
+        'cvc_fromprevmonth', 'cvc_newlyregistered', 'cvc_newlyregconcluded', 'cvc_concluded',
+        'cvc', 'perpetrators_imprisoned', 'perpetrators_acquited', 'perpetrators_fined',
+        'perpetrators', 'caseswithdrawn', 'referredchildsurvivors', 'cbc_fromprevmonth',
+        'cbc_newlyregistered', 'cbc_newlyregconcluded', 'cbc_concluded', 'cbc',
+        'cbctype_childmaintenance', 'cbctpe_childcustody', 'cbctye_childfosterage', 'childadoption_cbctype',
+        'cbctpe_childguardianship', 'cbctype_childaccess', 'cbctype', 'inconflict_fromprevmonth',
+        'inconflict_newlyregistered', 'inconflict_newlyregconcluded', 'inconflict_concluded', 'inconflict',
+        'diverted_preliminaryenquiry', 'diverted_aftertrial', 'diverted', 'bailed',
+        'custodialorder_total', 'custodialorder_reformatories', 'custodialorder_prisons_', 'remanded_total',
+        'remanded_safetyhomes', 'remanded_reformatorycentres', 'remanded_policecells', 'specialreferrals',
     ]
 }
 
@@ -111,6 +124,22 @@ INDICATOR_CATEGORY_MAPPING = {
         'bailed': ['boys', 'girls'],
         'releasedfreely': ['boys', 'girls'],
         'releasedin48hrs': ['boys', 'girls'],
+    },
+    'ncjf': {
+        'cvc': ['fromprevmonth', 'newlyregistered', 'newlyregconcluded', 'concluded'],
+        'cbc': ['fromprevmonth', 'newlyregistered', 'newlyregconcluded', 'concluded'],
+        'cbctype': [
+            'childmaintenance', 'childcustody', 'cildfosterage', 'childadoption',
+            'childparentage', 'childguardianship', 'childaccess', 'estatedistribution'],
+        'inconflict': ['fromprevmonth', 'newlyregistered', 'newlyregconcluded', 'concluded'],
+        'custodialorder': ['total', 'reformatories', 'prisons'],
+        'remanded': ['total', 'safetyhomes', 'reformatorycentres', 'policecells'],
+        'diverted': ['preliminaryinquiry', 'aftertrial'],
+        'bailed': [],
+        'specialreferrals': [],
+        'caseswithdrawn': [],
+        'referredchildsurvivors': []
+
     }
 }
 
@@ -132,5 +161,15 @@ INDICATOR_THRESHOLD = {
     'bailed': 100,
     'takentocourt': 80,
     'releasedfreely': 40,
-    'releasedin48hrs': 30
+    'releasedin48hrs': 30,
+    'specialreferrals': 40,
+    'caseswithdrawn': 15,
+    'referredchildsurvivors': 25,
+    'cvc': 200,
+    'cbctype': 300,
+    'cbc': 150,
+    'inconflict': 75,
+    'custodialorder': 55,
+    'remanded': 25,
+    'diverted': 15,
 }

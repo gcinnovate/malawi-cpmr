@@ -21,6 +21,9 @@ def save_flowdata(request_args, request_json, districts, pstations):
         year = datetime.now().year - 1
     else:
         year = datetime.now().year
+    if report_type in ('ncjf'):
+        year = datetime.now().year
+
     month_str = "{0}-{1:02}".format(year, MONTHS_DICT[month])
 
     # redis_client.districts set using @app.before_first_request
