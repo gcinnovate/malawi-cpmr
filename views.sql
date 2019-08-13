@@ -96,3 +96,55 @@ CREATE VIEW cases_by_police_station AS
     GROUP BY flow_data_pvsu_view.police_station
      ORDER BY flow_data_pvsu_view.police_station;
 
+DROP VIEW IF EXISTS flow_data_ncjf_view;
+CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
+    SELECT
+        a.month, a.year, a.report_type, a.msisdn,
+        b.name AS district,
+        c.name AS region,
+        d.name AS justice_courts,
+        d.longitude, d.latitude,
+        (a.values->>'fromprevmonth_cvc')::int fromprevmonth_cvc,
+        (a.values->>'newlyregistered_cvc')::int newlyregistered_cvc,
+        (a.values->>'newlyregconcluded_cvc')::int newlyregconcluded_cvc,
+        (a.values->>'concluded_cvc')::int concluded_cvc,
+        (a.values->>'cvc')::int cvc,
+        (a.values->>'fromprevmonth_cbc')::int fromprevmonth_cbc,
+        (a.values->>'newlyregistered_cbc')::int newlyregistered_cbc,
+        (a.values->>'newlyregconcluded_cbc')::int newlyregconcluded_cbc,
+        (a.values->>'concluded_cbc')::int concluded_cbc,
+        (a.values->>'cbc')::int cbc,
+        (a.values->>'fromprevmonth_inconflict')::int fromprevmonth_inconflict,
+        (a.values->>'newlyregistered_inconflict')::int newlyregistered_inconflict,
+        (a.values->>'newlyregconcluded_inconflict')::int newlyregconcluded_inconflict,
+        (a.values->>'concluded_inconflict')::int concluded_inconflict,
+        (a.values->>'inconflict')::int inconflict,
+        (a.values->>'childmaintenance_cbctype')::int childmaintenance_cbctype,
+        (a.values->>'childcustody_cbctype')::int childcustody_cbctype,
+        (a.values->>'childfosterage_cbctype')::int childfosterage_cbctype,
+        (a.values->>'childadoption_cbctype')::int childadoption_cbctype,
+        (a.values->>'childparentage_cbctype')::int childparentage_cbctype,
+        (a.values->>'childguardianship_cbctype')::int childguardianship_cbctype,
+        (a.values->>'childaccess_cbctype')::int childaccess_cbctype,
+        (a.values->>'estatedistribution_cbctype')::int estatedistribution_cbctype,
+        (a.values->>'total_custodialorder')::int total_custodialorder,
+        (a.values->>'reformatories_custodialorder')::int reformatories_custodialorder,
+        (a.values->>'prisons_custodialorder')::int prisons_custodialorder,
+        (a.values->>'total_remanded')::int total_remanded,
+        (a.values->>'safetyhomes_remanded')::int safetyhomes_remanded,
+        (a.values->>'reformatorycentres_remanded')::int reformatorycentres_remanded,
+        (a.values->>'policecells_remanded')::int policecells_remanded,
+        (a.values->>'preliminaryinquiry_diverted')::int preliminaryinquiry_diverted,
+        (a.values->>'aftertrial_diverted')::int aftertrial_diverted,
+        (a.values->>'diverted')::int diverted,
+        (a.values->>'bailed')::int bailed,
+        (a.values->>'specialreferrals')::int specialreferrals,
+        (a.values->>'caseswithdrawn')::int caseswithdrawn,
+        (a.values->>'referredchildsurvivors')::int referredchildsurvivors
+    FROM
+        flow_data a
+        LEFT OUTER JOIN locations AS b ON a.district = b.id
+        LEFT OUTER JOIN locations AS c ON a.region = c.id
+        LEFT OUTER JOIN justice_courts AS d ON a.court = d.id
+    WHERE
+        a.report_type = 'ncjf';

@@ -129,7 +129,7 @@ INDICATOR_CATEGORY_MAPPING = {
         'cvc': ['fromprevmonth', 'newlyregistered', 'newlyregconcluded', 'concluded'],
         'cbc': ['fromprevmonth', 'newlyregistered', 'newlyregconcluded', 'concluded'],
         'cbctype': [
-            'childmaintenance', 'childcustody', 'cildfosterage', 'childadoption',
+            'childmaintenance', 'childcustody', 'childfosterage', 'childadoption',
             'childparentage', 'childguardianship', 'childaccess', 'estatedistribution'],
         'inconflict': ['fromprevmonth', 'newlyregistered', 'newlyregconcluded', 'concluded'],
         'custodialorder': ['total', 'reformatories', 'prisons'],
