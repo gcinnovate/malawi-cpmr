@@ -102,7 +102,7 @@ CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
         a.month, a.year, a.report_type, a.msisdn,
         b.name AS district,
         c.name AS region,
-        d.name AS justice_courts,
+        d.name AS court,
         d.longitude, d.latitude,
         (a.values->>'fromprevmonth_cvc')::int fromprevmonth_cvc,
         (a.values->>'newlyregistered_cvc')::int newlyregistered_cvc,
