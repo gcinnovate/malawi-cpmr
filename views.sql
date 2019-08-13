@@ -100,6 +100,7 @@ DROP VIEW IF EXISTS flow_data_ncjf_view;
 CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
     SELECT
         a.month, a.year, a.report_type, a.msisdn,
+        1 AS nation,
         b.name AS district,
         c.name AS region,
         d.name AS court,
