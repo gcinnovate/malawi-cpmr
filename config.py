@@ -77,16 +77,16 @@ INDICATORS = {
     ],
     'ncjf': [
         'month',
-        'cvc_fromprevmonth', 'cvc_newlyregistered', 'cvc_newlyregconcluded', 'cvc_concluded',
-        'cvc', 'perpetrators_imprisoned', 'perpetrators_acquited', 'perpetrators_fined',
-        'perpetrators', 'caseswithdrawn', 'referredchildsurvivors', 'cbc_fromprevmonth',
-        'cbc_newlyregistered', 'cbc_newlyregconcluded', 'cbc_concluded', 'cbc',
-        'cbctype_childmaintenance', 'cbctpe_childcustody', 'cbctye_childfosterage', 'childadoption_cbctype',
-        'cbctpe_childguardianship', 'cbctype_childaccess', 'cbctype', 'inconflict_fromprevmonth',
-        'inconflict_newlyregistered', 'inconflict_newlyregconcluded', 'inconflict_concluded', 'inconflict',
-        'diverted_preliminaryenquiry', 'diverted_aftertrial', 'diverted', 'bailed',
-        'custodialorder_total', 'custodialorder_reformatories', 'custodialorder_prisons_', 'remanded_total',
-        'remanded_safetyhomes', 'remanded_reformatorycentres', 'remanded_policecells', 'specialreferrals',
+        'fromprevmonth_cvc', 'newlyregistered_cvc', 'newlyregconcluded_cvc', 'concluded_cvc',
+        'cvc', 'imprisoned_perpetrators', 'acquited_perpetrators', 'fined_perpetrators',
+        'perpetrators', 'caseswithdrawn', 'referredchildsurvivors', 'fromprevmonth_cbc',
+        'newlyregistered_cbc', 'newlyregconcluded_cbc', 'concluded_cbc', 'cbc',
+        'childmaintenance_cbctype', 'childcustody_cbctype', 'childfosterage_cbctype', 'childadoption_cbctype',
+        'childguardianship_cbctype', 'childaccess_cbctype', 'cbctype', 'fromprevmonth_inconflict',
+        'newlyregistered_inconflict', 'newlyregconcluded_inconflict', 'concluded_inconflict', 'inconflict',
+        'preliminaryenquiry_diverted', 'aftertrial_diverted', 'diverted', 'bailed',
+        'total_custodialorder', 'reformatories_custodialorder', 'prisons_custodialorder', 'remanded_total',
+        'safetyhomes_remanded', 'reformatorycentres_remanded', 'policecells_remanded', 'specialreferrals',
     ]
 }
 
