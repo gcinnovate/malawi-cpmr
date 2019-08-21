@@ -23,7 +23,7 @@ $ pip install -r requirements.txt
 The configurations for the CPMR application are made using environment variables.
 Refer to the config.py file for the environment variables to set.
 
-$ export FLASK_APP=cmpr.py
+$ export FLASK_APP=cpmr.py
 
 $ export FLASK_CONFIG=default
 

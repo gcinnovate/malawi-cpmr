@@ -135,10 +135,11 @@ INDICATOR_CATEGORY_MAPPING = {
         'custodialorder': ['total', 'reformatories', 'prisons'],
         'remanded': ['total', 'safetyhomes', 'reformatorycentres', 'policecells'],
         'diverted': ['preliminaryinquiry', 'aftertrial'],
+        'perpetrators': ['imprisoned', 'acquited', 'fined'],
         'bailed': [],
         'specialreferrals': [],
         'caseswithdrawn': [],
-        'referredchildsurvivors': []
+        'referredchildsurvivors': [],
 
     }
 }
@@ -172,4 +173,5 @@ INDICATOR_THRESHOLD = {
     'custodialorder': 55,
     'remanded': 25,
     'diverted': 15,
+    'perpetrators': 60
 }
