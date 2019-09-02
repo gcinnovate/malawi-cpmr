@@ -1,5 +1,6 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
 DROP VIEW IF EXISTS cases_by_police_station;
+DROP VIEW IF EXISTS pvsu_casetypes_view;
 DROP VIEW IF EXISTS flow_data_pvsu_view;
 CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
     SELECT
@@ -19,7 +20,11 @@ CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
         (a.values->>'maritalconflict')::int maritalconflict,
         (a.values->>'childneglect')::int childneglect,
         (a.values->>'economicabuse')::int economicabuse,
-        (a.values->>'total_cases')::int total_cases
+        (a.values->>'breachofpeace')::int breachofpeace,
+        (a.values->>'total_cases')::int total_cases,
+        created,
+        (a.month || '-01')::date rdate,
+        'Malawi' nation
     FROM
         flow_data a
         LEFT OUTER JOIN locations AS b ON a.district = b.id
@@ -42,7 +47,8 @@ CREATE OR REPLACE VIEW flow_data_diversion_view  AS
         (a.values->>'bailed')::int bailed,
         (a.values->>'releasedfreely')::int releasedfreely,
         (a.values->>'releasedin48hrs')::int releasedin48hrs,
-        (a.values->>'total_cases')::int total_cases
+        (a.values->>'total_cases')::int total_cases,
+        created
     FROM
         flow_data a
         LEFT OUTER JOIN locations AS b ON a.district = b.id
@@ -145,7 +151,9 @@ CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
         (a.values->>'fined_perpetrators')::int fined_perpetrators,
         (a.values->>'specialreferrals')::int specialreferrals,
         (a.values->>'caseswithdrawn')::int caseswithdrawn,
-        (a.values->>'referredchildsurvivors')::int referredchildsurvivors
+        (a.values->>'referredchildsurvivors')::int referredchildsurvivors,
+        created,
+        (a.month || '-01')::date rdate
     FROM
         flow_data a
         LEFT OUTER JOIN locations AS b ON a.district = b.id
@@ -153,3 +161,41 @@ CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
         LEFT OUTER JOIN justice_courts AS d ON a.court = d.id
     WHERE
         a.report_type = 'ncjf';
+
+-- pvsu_pie_chart
+DROP VIEW IF EXISTS pvsu_casetypes_view;
+CREATE VIEW pvsu_casetypes_view AS
+    SELECT
+        sum(physicalviolence) physicalviolence,
+        sum(suicide) suicide,
+        sum(defilement) defilement,
+        sum(rape) rape,
+        sum(indecentassault) indecentassault,
+        sum(sexualoffences) sexualoffences,
+        sum(humantrafficking) humantrafficking,
+        sum(kidnapping) kidnapping,
+        sum(maritalconflict) maritalconflict,
+        sum(childneglect) childneglect,
+        sum(economicabuse) economicabuse,
+        month, year
+    FROM flow_data_pvsu_view
+    GROUP BY month, year;
+
+
+DROP VIEW IF EXISTS summary_cases_view;
+CREATE OR REPLACE VIEW summary_cases_view  AS
+    SELECT
+        a.casetype, a.value,
+        a.month, a.year, a.report_type,
+        a.summary_for,
+        b.name AS district,
+        c.name AS region,
+        d.name AS police_station,
+        d.longitude, d.latitude,
+        (a.month || '-01')::date rdate
+    FROM
+        summary_cases a
+        LEFT OUTER JOIN locations AS b ON a.district = b.id
+        LEFT OUTER JOIN locations AS c ON a.region = c.id
+        LEFT OUTER JOIN police_stations AS d ON a.station = d.id
+        LEFT OUTER JOIN justice_courts AS e ON a.court = e.id;

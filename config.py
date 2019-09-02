@@ -64,6 +64,7 @@ INDICATORS = {
         'boys_maritalconflict', 'girls_maritalconflict', 'men_maritalconflict', 'women_maritalconflict',
         'boys_childneglect', 'girls_childneglect',
         'boys_economicabuse', 'girls_economicabuse', 'men_economicabuse', 'women_economicabuse',
+        'boys_breachofpeace', 'girls_breachofpeace', 'men_breachofpeace', 'women_breachofpeace'
     ],
     'diversion': [
         'month',
@@ -93,7 +94,8 @@ INDICATORS = {
 REPORT_AGGREGATE_INIDICATORS = {
     'pvsu': [
         'physicalviolence', 'suicide', 'defilement', 'rape', 'indecentassault', 'humantrafficking',
-        'kidnapping', 'sexualoffences', 'maritalconflict', 'childneglect', 'economicabuse'
+        'kidnapping', 'sexualoffences', 'maritalconflict', 'childneglect', 'economicabuse',
+        'breachofpeace'
     ],
     'diversion': [
         'arrested', 'divertedatpolice', 'takentocourt', 'bailed',
@@ -115,7 +117,8 @@ INDICATOR_CATEGORY_MAPPING = {
         'sexualoffences': ['boys', 'girls', 'men', 'women'],
         'maritalconflict': ['boys', 'girls', 'men', 'women'],
         'childneglect': ['boys', 'girls', 'men', 'women'],
-        'economicabuse': ['boys', 'girls', 'men', 'women']
+        'economicabuse': ['boys', 'girls', 'men', 'women'],
+        'breachofpeace': ['boys', 'girls', 'men', 'women'],
     },
     'diversion': {
         'arrested': ['boys', 'girls'],
@@ -157,6 +160,7 @@ INDICATOR_THRESHOLD = {
     'maritalconflict': random.randint(0, 60),
     'childneglect': random.randint(0, 40),
     'economicabuse': random.randint(0, 120),
+    'breachofpeace': random.randint(0, 140),
     'arrested': 1000,
     'divertedatpolice': 200,
     'bailed': 100,
@@ -174,4 +178,20 @@ INDICATOR_THRESHOLD = {
     'remanded': 25,
     'diverted': 15,
     'perpetrators': 60
+}
+
+INDICATOR_NAME_MAPPING = {
+    'physicalviolence': 'Physical Violence',
+    'suicide': 'Suicide',
+    'defilement': 'Defilement',
+    'rape': 'Rape',
+    'indecentassault': 'Indecent assault',
+    'humantrafficking': 'Human trafficking',
+    'kidnapping': 'Kidnapping',
+    'sexualoffences': 'Other sexual violence',
+    'maritalconflict': 'Marital and interpersonal conflict',
+    'childneglect': 'Child neglect',
+    'economicabuse': 'Economic abuse',
+    'breachofpeace': 'Conduct likely to cause breach of peace'
+
 }

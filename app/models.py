@@ -98,6 +98,22 @@ class Indicator(db.Model):
         return json_indicator
 
 
+class SummaryCases(db.Model):
+    """A summary of different cases types, by report type"""
+    __tablename__ = 'summary_cases'
+    id = db.Column(db.Integer, primary_key=True)
+    casetype = db.Column(db.String(), index=True)
+    value = db.Column(db.Integer)
+    region = db.Column(db.Integer, db.ForeignKey('locations.id'))
+    district = db.Column(db.Integer, db.ForeignKey('locations.id'))
+    station = db.Column(db.Integer, db.ForeignKey('police_stations.id'))
+    court = db.Column(db.Integer, db.ForeignKey('justice_courts.id'))
+    month = db.Column(db.String(), index=True)
+    year = db.Column(db.Integer, index=True)
+    report_type = db.Column(db.String(), index=True)
+    summary_for = db.Column(db.String(), index=True)
+
+
 class Permission:
     VIEW = 1
     EDIT = 2
