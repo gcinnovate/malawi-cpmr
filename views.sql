@@ -53,7 +53,8 @@ CREATE OR REPLACE VIEW flow_data_diversion_view  AS
         (a.values->>'releasedfreely')::int releasedfreely,
         (a.values->>'releasedin48hrs')::int releasedin48hrs,
         (a.values->>'total_cases')::int total_cases,
-        created
+        created,
+        (a.month || '-28')::date rdate
     FROM
         flow_data a
         LEFT OUTER JOIN locations AS b ON a.district = b.id
