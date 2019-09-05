@@ -28,7 +28,7 @@ CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
         (a.values->>'men_total')::int men_total,
         (a.values->>'women_total')::int women_total,
         created,
-        (a.month || '-01')::date rdate,
+        (a.month || '-28')::date rdate,
         'Malawi' nation
     FROM
         flow_data a
@@ -183,9 +183,9 @@ CREATE VIEW pvsu_casetypes_view AS
         sum(childneglect) childneglect,
         sum(economicabuse) economicabuse,
         sum(breachofpeace) breachofpeace,
-        month, year
+        month, year, region
     FROM flow_data_pvsu_view
-    GROUP BY month, year;
+    GROUP BY month, year, region;
 
 DROP VIEW IF EXISTS pvsu_cases_demographics_view;
 CREATE VIEW pvsu_cases_demographics_view AS
