@@ -184,9 +184,9 @@ CREATE VIEW pvsu_casetypes_view AS
         sum(childneglect) childneglect,
         sum(economicabuse) economicabuse,
         sum(breachofpeace) breachofpeace,
-        month, year, region
+        month, year
     FROM flow_data_pvsu_view
-    GROUP BY month, year, region;
+    GROUP BY month, year;
 
 DROP VIEW IF EXISTS pvsu_cases_demographics_view;
 CREATE VIEW pvsu_cases_demographics_view AS
