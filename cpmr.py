@@ -126,7 +126,7 @@ def initdb():
 @click.option('--end-year', '-e', default=2020)
 def load_test_data(report, start_year, end_year):
     from config import INDICATOR_CATEGORY_MAPPING, INDICATOR_THRESHOLD
-    print(report)
+    # print(report)
     police_stations = PoliceStation.query.all()
     year = datetime.now().year
     for y in range(start_year, end_year):
@@ -139,6 +139,10 @@ def load_test_data(report, start_year, end_year):
                 region_id = Location.query.filter_by(id=district_id).first().parent_id
                 month_str = "{0}-{1:02}".format(y, m)
                 total_cases = 0
+                boys_total = 0
+                girls_total = 0
+                men_total = 0
+                women_total = 0
                 values = {}
                 for k, v in INDICATOR_CATEGORY_MAPPING.get(report).items():
                     indcators_total = 0
@@ -147,9 +151,22 @@ def load_test_data(report, start_year, end_year):
                         val = random.choice(range(INDICATOR_THRESHOLD[k]))
                         values[field] = val
                         indcators_total += val
+                        if ind == 'boys':
+                            boys_total += val
+                        elif ind == 'girls':
+                            girls_total += val
+                        elif ind == 'men':
+                            men_total += val
+                        elif ind == 'women':
+                            women_total += val
                     values[k] = indcators_total
                     total_cases += indcators_total
                 values['total_cases'] = total_cases
+                if report == 'pvsu':
+                    values['boys_total'] = boys_total
+                    values['girls_total'] = girls_total
+                    values['men_total'] = men_total
+                    values['women_total'] = women_total
                 db.session.add(FlowData(
                     region=region_id, district=district_id, station=p.id, month=month_str,
                     year=y, report_type=report, values=values))
@@ -235,7 +252,7 @@ def create_views():
 
 @app.cli.command("refresh-pvsu-casetypes")
 def refresh_pvsu_casetypes():
-    results = db.engine.execute("SELECT * FROM pvsu_casetypes_view order by year desc LIMIT 15")
+    results = db.engine.execute("SELECT * FROM pvsu_casetypes_view order by year desc")
     # print(results.keys())
     records = []
     for row in results:
@@ -251,12 +268,37 @@ def refresh_pvsu_casetypes():
     for r in records:
         summary = SummaryCases.query.filter_by(
             casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3],
-            report_type='pvsu', summary_for='nation').first()
+            report_type='pvsu', summary_for='nation', summary_slug='types').first()
         if summary:
             summary.value = r[1]
         else:
             s = SummaryCases(
                 casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
-                report_type='pvsu', summary_for='nation')
+                report_type='pvsu', summary_for='nation', summary_slug='types')
+            db.session.add(s)
+        db.session.commit()
+
+    # Load data for pvsu national demography
+    results = db.engine.execute("SELECT * FROM pvsu_cases_demographics_view order by year desc")
+    records = []
+    for row in results:
+        month = row['month']
+        year = row['year']
+        for k in results.keys():
+            if k in ('month', 'year'):
+                continue
+            casetype, cases = (k, row[k])
+            records.append((casetype, cases, month, year))
+
+    for r in records:
+        summary = SummaryCases.query.filter_by(
+            casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3],
+            report_type='pvsu', summary_for='nation', summary_slug='demography').first()
+        if summary:
+            summary.value = r[1]
+        else:
+            s = SummaryCases(
+                casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
+                report_type='pvsu', summary_for='nation', summary_slug='demography')
             db.session.add(s)
         db.session.commit()

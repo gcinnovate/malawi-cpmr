@@ -192,6 +192,11 @@ INDICATOR_NAME_MAPPING = {
     'maritalconflict': 'Marital and interpersonal conflict',
     'childneglect': 'Child neglect',
     'economicabuse': 'Economic abuse',
-    'breachofpeace': 'Conduct likely to cause breach of peace'
+    'breachofpeace': 'Conduct likely to cause breach of peace',
+    # demorgraphics
+    'boys_total': 'Boys',
+    'girls_total': 'Girls',
+    'men_total': 'Men',
+    'women_total': 'Women',
 
 }

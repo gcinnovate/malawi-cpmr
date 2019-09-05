@@ -112,6 +112,7 @@ class SummaryCases(db.Model):
     year = db.Column(db.Integer, index=True)
     report_type = db.Column(db.String(), index=True)
     summary_for = db.Column(db.String(), index=True)
+    summary_slug = db.Column(db.String(), index=True)
 
 
 class Permission:

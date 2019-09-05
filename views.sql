@@ -1,6 +1,7 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
 DROP VIEW IF EXISTS cases_by_police_station;
 DROP VIEW IF EXISTS pvsu_casetypes_view;
+DROP VIEW IF EXISTS pvsu_cases_demographics_view;
 DROP VIEW IF EXISTS flow_data_pvsu_view;
 CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
     SELECT
@@ -22,6 +23,10 @@ CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
         (a.values->>'economicabuse')::int economicabuse,
         (a.values->>'breachofpeace')::int breachofpeace,
         (a.values->>'total_cases')::int total_cases,
+        (a.values->>'boys_total')::int boys_total,
+        (a.values->>'girls_total')::int girls_total,
+        (a.values->>'men_total')::int men_total,
+        (a.values->>'women_total')::int women_total,
         created,
         (a.month || '-01')::date rdate,
         'Malawi' nation
@@ -177,6 +182,18 @@ CREATE VIEW pvsu_casetypes_view AS
         sum(maritalconflict) maritalconflict,
         sum(childneglect) childneglect,
         sum(economicabuse) economicabuse,
+        sum(breachofpeace) breachofpeace,
+        month, year
+    FROM flow_data_pvsu_view
+    GROUP BY month, year;
+
+DROP VIEW IF EXISTS pvsu_cases_demographics_view;
+CREATE VIEW pvsu_cases_demographics_view AS
+    SELECT
+        sum(boys_total) boys_total,
+        sum(girls_total) girls_total,
+        sum(men_total) men_total,
+        sum(women_total) women_total,
         month, year
     FROM flow_data_pvsu_view
     GROUP BY month, year;
@@ -188,6 +205,7 @@ CREATE OR REPLACE VIEW summary_cases_view  AS
         a.casetype, a.value,
         a.month, a.year, a.report_type,
         a.summary_for,
+        a.summary_slug,
         b.name AS district,
         c.name AS region,
         d.name AS police_station,
