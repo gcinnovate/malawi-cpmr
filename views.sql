@@ -1,13 +1,14 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
 DROP VIEW IF EXISTS cases_by_police_station;
-DROP VIEW IF EXISTS pvsu_casetypes_view;
-DROP VIEW IF EXISTS pvsu_cases_demographics_view;
+DROP VIEW IF EXISTS pvsu_casetypes_regional_view;
+DROP VIEW IF EXISTS pvsu_cases_demographics_regional_view;
 DROP VIEW IF EXISTS flow_data_pvsu_view;
 CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
     SELECT
         a.month, a.year, a.report_type, a.msisdn,
         b.name AS district,
         c.name AS region,
+        c.id AS region_id,
         d.name AS police_station,
         d.longitude, d.latitude,
         (a.values->>'suicide')::int suicide,
@@ -169,8 +170,9 @@ CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
         a.report_type = 'ncjf';
 
 -- pvsu_pie_chart
-DROP VIEW IF EXISTS pvsu_casetypes_view;
-CREATE VIEW pvsu_casetypes_view AS
+-- this is for the regional case types
+DROP VIEW IF EXISTS pvsu_casetypes_regional_view;
+CREATE VIEW pvsu_casetypes_regional_view AS
     SELECT
         sum(physicalviolence) physicalviolence,
         sum(suicide) suicide,
@@ -184,20 +186,20 @@ CREATE VIEW pvsu_casetypes_view AS
         sum(childneglect) childneglect,
         sum(economicabuse) economicabuse,
         sum(breachofpeace) breachofpeace,
-        month, year
+        month, year, region_id
     FROM flow_data_pvsu_view
-    GROUP BY month, year;
+    GROUP BY month, year, region_id;
 
-DROP VIEW IF EXISTS pvsu_cases_demographics_view;
-CREATE VIEW pvsu_cases_demographics_view AS
+DROP VIEW IF EXISTS pvsu_cases_demographics_regional_view;
+CREATE VIEW pvsu_cases_demographics_regional_view AS
     SELECT
         sum(boys_total) boys_total,
         sum(girls_total) girls_total,
         sum(men_total) men_total,
         sum(women_total) women_total,
-        month, year
+        month, year, region_id
     FROM flow_data_pvsu_view
-    GROUP BY month, year;
+    GROUP BY month, year, region_id;
 
 
 DROP VIEW IF EXISTS summary_cases_view;

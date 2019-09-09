@@ -252,53 +252,55 @@ def create_views():
 
 @app.cli.command("refresh-pvsu-casetypes")
 def refresh_pvsu_casetypes():
-    results = db.engine.execute("SELECT * FROM pvsu_casetypes_view order by year desc")
+    results = db.engine.execute("SELECT * FROM pvsu_casetypes_regional_view order by year desc")
     # print(results.keys())
     records = []
     for row in results:
         month = row['month']
         year = row['year']
+        region_id = row['region_id']
         for k in results.keys():
-            if k in ('month', 'year'):
+            if k in ('month', 'year', 'region_id'):
                 continue
             casetype, cases = (k, row[k])
-            records.append((casetype, cases, month, year))
+            records.append((casetype, cases, month, year, region_id))
 
     print(records)
     for r in records:
         summary = SummaryCases.query.filter_by(
             casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3],
-            report_type='pvsu', summary_for='nation', summary_slug='types').first()
+            region=r[4], report_type='pvsu', summary_for='region', summary_slug='types').first()
         if summary:
             summary.value = r[1]
         else:
             s = SummaryCases(
                 casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
-                report_type='pvsu', summary_for='nation', summary_slug='types')
+                region=r[4], report_type='pvsu', summary_for='region', summary_slug='types')
             db.session.add(s)
         db.session.commit()
 
-    # Load data for pvsu national demography
-    results = db.engine.execute("SELECT * FROM pvsu_cases_demographics_view order by year desc")
+    # Load data for pvsu regional demography
+    results = db.engine.execute("SELECT * FROM pvsu_cases_demographics_regional_view order by year desc")
     records = []
     for row in results:
         month = row['month']
         year = row['year']
+        region_id = row['region_id']
         for k in results.keys():
-            if k in ('month', 'year'):
+            if k in ('month', 'year', 'region_id'):
                 continue
             casetype, cases = (k, row[k])
-            records.append((casetype, cases, month, year))
+            records.append((casetype, cases, month, year, region_id))
 
     for r in records:
         summary = SummaryCases.query.filter_by(
-            casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3],
-            report_type='pvsu', summary_for='nation', summary_slug='demography').first()
+            casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3], region=r[4],
+            report_type='pvsu', summary_for='region', summary_slug='demography').first()
         if summary:
             summary.value = r[1]
         else:
             s = SummaryCases(
                 casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
-                report_type='pvsu', summary_for='nation', summary_slug='demography')
+                region=r[4], report_type='pvsu', summary_for='region', summary_slug='demography')
             db.session.add(s)
         db.session.commit()
