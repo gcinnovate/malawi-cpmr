@@ -240,8 +240,26 @@ CREATE VIEW cases_dealtwith_national_view AS
             WHEN region = 'Southern' THEN -15.748002 --Blantyre
         END AS latitude
 
-
     FROM
         flow_data_diversion_view
     GROUP BY month, region, rdate
     ORDER BY month, region;
+
+DROP VIEW IF EXISTS pvsu_cases_by_region_view;
+CREATE VIEW pvsu_cases_by_region_view AS
+    SELECT region, sum(total_cases) total_cases, rdate,
+    CASE
+            WHEN region = 'Central' THEN 33.780388 -- Lilongwe
+            WHEN region = 'Eastern' THEN 35.341996 -- Zomba
+            WHEN region = 'Northern' THEN 34.009877 -- Mzuzu
+            WHEN region = 'Southern' THEN 35.009247 -- Blantyre
+        END AS longitude,
+
+        CASE
+            WHEN region = 'Central' THEN -13.960508 -- Lilongwe
+            WHEN region = 'Eastern' THEN -15.377539 -- Zomba
+            WHEN region = 'Northern' THEN -11.437847 -- Mzuzu
+            WHEN region = 'Southern' THEN -15.748002 --Blantyre
+        END AS latitude
+    FROM flow_data_pvsu_view
+    GROUP BY region, month, rdate;
