@@ -1,4 +1,5 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
+DROP VIEW IF EXISTS cases_dealtwith_national_view;
 DROP VIEW IF EXISTS cases_by_police_station;
 DROP VIEW IF EXISTS pvsu_casetypes_regional_view;
 DROP VIEW IF EXISTS pvsu_cases_demographics_regional_view;
@@ -10,7 +11,7 @@ CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
         c.name AS region,
         c.id AS region_id,
         d.name AS police_station,
-        d.longitude, d.latitude,
+        d.longitude::numeric, d.latitude::numeric,
         (a.values->>'suicide')::int suicide,
         (a.values->>'physicalviolence')::int physicalviolence,
         (a.values->>'rape')::int  rape,
@@ -30,7 +31,7 @@ CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
         (a.values->>'women_total')::int women_total,
         created,
         (a.month || '-28')::date rdate,
-        'Malawi' nation
+        'Malawi'::text AS nation
     FROM
         flow_data a
         LEFT OUTER JOIN locations AS b ON a.district = b.id
@@ -220,3 +221,27 @@ CREATE OR REPLACE VIEW summary_cases_view  AS
         LEFT OUTER JOIN locations AS c ON a.region = c.id
         LEFT OUTER JOIN police_stations AS d ON a.station = d.id
         LEFT OUTER JOIN justice_courts AS e ON a.court = e.id;
+
+DROP VIEW IF EXISTS cases_dealtwith_national_view;
+CREATE VIEW cases_dealtwith_national_view AS
+    SELECT
+        round((((sum(releasedin48hrs)+0.0)/sum(arrested))*100)::numeric, 2)  as dealtwith, month, region, rdate,
+        CASE
+            WHEN region = 'Central' THEN 33.780388 -- Lilongwe
+            WHEN region = 'Eastern' THEN 35.341996 -- Zomba
+            WHEN region = 'Northern' THEN 34.009877 -- Mzuzu
+            WHEN region = 'Southern' THEN 35.009247 -- Blantyre
+        END AS longitude,
+
+        CASE
+            WHEN region = 'Central' THEN -13.960508 -- Lilongwe
+            WHEN region = 'Eastern' THEN -15.377539 -- Zomba
+            WHEN region = 'Northern' THEN -11.437847 -- Mzuzu
+            WHEN region = 'Southern' THEN -15.748002 --Blantyre
+        END AS latitude
+
+
+    FROM
+        flow_data_diversion_view
+    GROUP BY month, region, rdate
+    ORDER BY month, region;
