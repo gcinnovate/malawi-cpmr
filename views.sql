@@ -1,6 +1,8 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
+DROP VIEW IF EXISTS cases_dealtwith_regional_view;
 DROP VIEW IF EXISTS cases_dealtwith_national_view;
 DROP VIEW IF EXISTS cases_by_police_station;
+DROP VIEW IF EXISTS pvsu_cases_by_region_view;
 DROP VIEW IF EXISTS pvsu_casetypes_regional_view;
 DROP VIEW IF EXISTS pvsu_cases_demographics_regional_view;
 DROP VIEW IF EXISTS flow_data_pvsu_view;
@@ -101,6 +103,7 @@ $$
     END;
 $$ language 'plpgsql';
 
+DROP VIEW IF EXISTS cases_by_police_station;
 CREATE VIEW cases_by_police_station AS
     SELECT flow_data_pvsu_view.police_station,
         sum(flow_data_pvsu_view.total_cases) AS total,
@@ -245,21 +248,31 @@ CREATE VIEW cases_dealtwith_national_view AS
     GROUP BY month, region, rdate
     ORDER BY month, region;
 
+DROP VIEW IF EXISTS cases_dealtwith_regional_view;
+CREATE VIEW cases_dealtwith_regional_view AS
+    SELECT
+        round((((sum(releasedin48hrs)+0.0)/sum(arrested))*100)::numeric, 2)  as dealtwith, month, police_station,
+        rdate, region, longitude, latitude
+    FROM
+        flow_data_diversion_view
+    GROUP BY
+        month, police_station, region, rdate, longitude, latitude;
+
 DROP VIEW IF EXISTS pvsu_cases_by_region_view;
 CREATE VIEW pvsu_cases_by_region_view AS
     SELECT region, sum(total_cases) total_cases, rdate,
-    CASE
+    (CASE
             WHEN region = 'Central' THEN 33.780388 -- Lilongwe
             WHEN region = 'Eastern' THEN 35.341996 -- Zomba
             WHEN region = 'Northern' THEN 34.009877 -- Mzuzu
             WHEN region = 'Southern' THEN 35.009247 -- Blantyre
-        END AS longitude,
+        END)::NUMERIC AS longitude,
 
-        CASE
+        (CASE
             WHEN region = 'Central' THEN -13.960508 -- Lilongwe
             WHEN region = 'Eastern' THEN -15.377539 -- Zomba
             WHEN region = 'Northern' THEN -11.437847 -- Mzuzu
             WHEN region = 'Southern' THEN -15.748002 --Blantyre
-        END AS latitude
+        END)::NUMERIC AS latitude
     FROM flow_data_pvsu_view
     GROUP BY region, month, rdate;
