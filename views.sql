@@ -260,7 +260,7 @@ CREATE VIEW cases_dealtwith_regional_view AS
 
 DROP VIEW IF EXISTS pvsu_cases_by_region_view;
 CREATE VIEW pvsu_cases_by_region_view AS
-    SELECT region, sum(total_cases) total_cases, rdate,
+    SELECT region, sum(total_cases) total_cases, rdate, month,
     (CASE
             WHEN region = 'Central' THEN 33.780388 -- Lilongwe
             WHEN region = 'Eastern' THEN 35.341996 -- Zomba
