@@ -44,6 +44,12 @@ def before_first_request_func():
         police_stations[s.name] = s.id
     redis_client.police_stations = police_stations
 
+    courts = JusticeCourt.query.all()
+    justice_courts = {}
+    for c in courts:
+        justice_courts[c.name] = c.id
+    redis_client.justice_courts = justice_courts
+
     print("This function will run once")
 
 
@@ -108,10 +114,10 @@ def initdb():
     db.session.add(PoliceStation(name='Mzuzu', district_id=mzimba.id))
 
     nkhotakota = Location.query.filter_by(name='Nkhotakota', level=3).all()[0]
-    db.session.add(PoliceStation(name='Nkhuriga', district_id=nkhotakota.id))
+    db.session.add(PoliceStation(name='Nkhunga', district_id=nkhotakota.id))
 
     dowa = Location.query.filter_by(name='Dowa', level=3).all()[0]
-    db.session.add(PoliceStation(name='Mponero', district_id=dowa.id))
+    db.session.add(PoliceStation(name='Mponela', district_id=dowa.id))
 
     lilongwe = Location.query.filter_by(name='Lilongwe', level=3).all()[0]
     db.session.add(PoliceStation(name='Kanengo', district_id=lilongwe.id))
@@ -124,7 +130,8 @@ def initdb():
 @click.option('--report', '-r', default='pvsu')
 @click.option('--start-year', '-s', default=2016)
 @click.option('--end-year', '-e', default=2020)
-def load_test_data(report, start_year, end_year):
+@click.option('--init', '-i', default=0)
+def load_test_data(report, start_year, end_year, init):
     from config import INDICATOR_CATEGORY_MAPPING, INDICATOR_THRESHOLD
     # print(report)
     police_stations = PoliceStation.query.all()
@@ -148,7 +155,10 @@ def load_test_data(report, start_year, end_year):
                     indcators_total = 0
                     for ind in v:
                         field = "{0}_{1}".format(ind, k)
-                        val = random.choice(range(INDICATOR_THRESHOLD[k]))
+                        if init:
+                            val = 0
+                        else:
+                            val = random.choice(range(INDICATOR_THRESHOLD[k]))
                         values[field] = val
                         indcators_total += val
                         if ind == 'boys':

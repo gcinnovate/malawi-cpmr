@@ -52,7 +52,7 @@ INDICATORS = {
     'pvsu': [
         'month', 'physicalviolence', 'suicide', 'defilement', 'rape', 'indecentassault',
         'humantrafficking', 'kidnapping', 'sexualoffences', 'maritalconflict', 'childneglect',
-        'economicabuse',
+        'economicabuse', 'breachofpeace',
         'boys_physicalviolence', 'girls_physicalviolence', 'men_physicalviolence', 'women_physicalviolence',
         'boys_suicide', 'girls_suicide', 'men_suicide', 'women_suicide',
         'girls_defilement',

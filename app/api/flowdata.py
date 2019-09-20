@@ -19,8 +19,9 @@ def flowdata_webhook():
     # redis_client.districts set using @app.before_first_request
     districts = redis_client.districts
     police_stations = redis_client.police_stations
+    justice_courts = redis_client.justice_courts
 
     save_flowdata.delay(
-        request.args, request.json, districts, police_stations)
+        request.args, request.json, districts, police_stations, justice_courts)
 
     return jsonify({'message': 'success'})
