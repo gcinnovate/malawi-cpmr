@@ -68,7 +68,7 @@ INDICATORS = {
     ],
     'diversion': [
         'month',
-        'arrested', 'divertedatpolice', 'takentocourt', 'bailed', 'releasedfreely', 'releasedin24hrs',
+        'arrested', 'divertedatpolice', 'takentocourt', 'bailed', 'releasedfreely', 'releasedin48hrs',
         'boys_arrested', 'girls_arrested',
         'boys_divertedatpolice', 'girls_divertedatpolice',
         'boys_takentocourt', 'girls_takentocourt',
