@@ -217,7 +217,7 @@ CREATE OR REPLACE VIEW summary_cases_view  AS
         c.name AS region,
         d.name AS police_station,
         d.longitude, d.latitude,
-        (a.month || '-01')::date rdate
+        (a.month || '-28')::date rdate
     FROM
         summary_cases a
         LEFT OUTER JOIN locations AS b ON a.district = b.id

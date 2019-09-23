@@ -130,14 +130,18 @@ def initdb():
 @click.option('--report', '-r', default='pvsu')
 @click.option('--start-year', '-s', default=2016)
 @click.option('--end-year', '-e', default=2020)
+@click.option('--start-month', '-m', default=1)
+@click.option('--end-month', '-n', default=13)
 @click.option('--init', '-i', default=0)
-def load_test_data(report, start_year, end_year, init):
+def load_test_data(report, start_year, end_year, start_month, end_month, init):
     from config import INDICATOR_CATEGORY_MAPPING, INDICATOR_THRESHOLD
     # print(report)
     police_stations = PoliceStation.query.all()
     year = datetime.now().year
+    if start_year == end_year:
+        end_year += 1
     for y in range(start_year, end_year):
-        for m in range(1, 13):
+        for m in range(start_month, end_month):
             if y == year and m > datetime.now().month - 1:
                 continue
             click.echo("{0}-{1:02}".format(y, m))
