@@ -228,7 +228,10 @@ CREATE OR REPLACE VIEW summary_cases_view  AS
 DROP VIEW IF EXISTS cases_dealtwith_national_view;
 CREATE VIEW cases_dealtwith_national_view AS
     SELECT
-        round((((sum(releasedin48hrs)+0.0)/sum(arrested))*100)::numeric, 2)  as dealtwith, month, region, rdate,
+        CASE
+            WHEN sum(arrested) > 0 THEN
+            round((((sum(releasedin48hrs)+0.0)/sum(arrested))*100)::numeric, 2)
+            ELSE 0 END AS dealtwith, month, region, rdate,
         CASE
             WHEN region = 'Central' THEN 33.780388 -- Lilongwe
             WHEN region = 'Eastern' THEN 35.341996 -- Zomba
@@ -251,8 +254,11 @@ CREATE VIEW cases_dealtwith_national_view AS
 DROP VIEW IF EXISTS cases_dealtwith_regional_view;
 CREATE VIEW cases_dealtwith_regional_view AS
     SELECT
-        round((((sum(releasedin48hrs)+0.0)/sum(arrested))*100)::numeric, 2)  as dealtwith, month, police_station,
-        rdate, region, longitude, latitude
+        CASE
+            WHEN sum(arrested) > 0 THEN
+                round((((sum(releasedin48hrs)+0.0)/sum(arrested))*100)::numeric, 2)
+            ELSE 0 END AS dealtwith,
+        month, police_station, rdate, region, longitude, latitude
     FROM
         flow_data_diversion_view
     GROUP BY
