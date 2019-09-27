@@ -14,8 +14,8 @@ MONTHS_DICT = dict((v, k) for k, v in enumerate(calendar.month_name))
 def save_flowdata(request_args, request_json, districts, pstations, jcourts):
     msisdn = request_args.get('msisdn')
     report_type = request_args.get('report_type')
-    station = request_args.get('station')
-    district = request_args.get('district')
+    station = request_args.get('station').title()
+    district = request_args.get('district').title()
 
     flowdata = get_indicators_from_rapidpro_results(
         request_json['results'], INDICATORS, report_type)
