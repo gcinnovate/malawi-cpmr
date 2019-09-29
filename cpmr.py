@@ -306,6 +306,7 @@ def refresh_pvsu_casetypes():
             casetype, cases = (k, row[k])
             records.append((casetype, cases, month, year, region_id))
 
+    print(records)
     for r in records:
         summary = SummaryCases.query.filter_by(
             casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3], region=r[4],
@@ -316,5 +317,37 @@ def refresh_pvsu_casetypes():
             s = SummaryCases(
                 casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
                 region=r[4], report_type='pvsu', summary_for='region', summary_slug='demography')
+            db.session.add(s)
+        db.session.commit()
+
+    results = db.engine.execute("SELECT * from ncjf_casetypes_national_view ORDER BY year desc, month desc;")
+    records = []
+    for row in results:
+        month = row['month']
+        year = row['year']
+        casetypes = {
+            'cvc': 'Child Victim', 'cbc':
+            'Child Beneficaries', 'inconflict':
+            'Children in conflict with the law'}
+        values = {'cvc': {}, 'cbc': {}, 'inconflict': {}}
+        for k in results.keys():
+            if k in ('month', 'year'):
+                continue
+            ctype, vkey = k.split('_')
+            values[vkey][ctype] = row[k]
+        for key, val in values.items():
+            records.append((casetypes[key], val, month, year))
+
+    print(records)
+    for r in records:
+        summary = SummaryCases.query.filter_by(
+            casetype=r[0], month=r[2], year=r[3],
+            report_type='ncjf', summary_for='nation', summary_slug='child_cases').first()
+        if summary:
+            summary.json_values = r[1]
+        else:
+            s = SummaryCases(
+                casetype=r[0], json_values=r[1], month=r[2], year=r[3],
+                report_type='ncjf', summary_for='nation', summary_slug='child_cases')
             db.session.add(s)
         db.session.commit()

@@ -1,4 +1,6 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
+DROP VIEW IF EXISTS ncjf_childcases_view;
+DROP VIEW IF EXISTS ncjf_casetypes_national_view;
 DROP VIEW IF EXISTS cases_dealtwith_regional_view;
 DROP VIEW IF EXISTS cases_dealtwith_national_view;
 DROP VIEW IF EXISTS cases_by_police_station;
@@ -9,8 +11,8 @@ DROP VIEW IF EXISTS flow_data_pvsu_view;
 CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
     SELECT
         a.month, a.year, a.report_type, a.msisdn,
-        b.name AS district,
         c.name AS region,
+        b.name AS district,
         c.id AS region_id,
         d.name AS police_station,
         d.longitude::numeric, d.latitude::numeric,
@@ -67,6 +69,44 @@ CREATE OR REPLACE VIEW flow_data_diversion_view  AS
     WHERE
         a.report_type = 'diversion';
 
+DROP VIEW IF EXISTS diversion_data_view;
+CREATE OR REPLACE VIEW diversion_data_view  AS
+    SELECT
+        a.month, a.year, a.msisdn,
+        c.name AS region,
+        b.name AS district,
+        d.name AS police_station,
+        created,
+        a.values->>'boys_arrested'boys_arrested,
+        a.values->>'girls_arrested' girls_arrested,
+        (a.values->>'arrested')::int arrested,
+        a.values->>'boys_divertedatpolice' boys_divertedatpolice,
+        a.values->>'girls_divertedatpolice' girls_divertedatpolice,
+        (a.values->>'divertedatpolice')::int divertedatpolice,
+        a.values->>'boys_takentocourt'  boys_takentocourt,
+        a.values->>'girls_takentocourt'  girls_takentocourt,
+        (a.values->>'takentocourt')::int  takentocourt,
+        a.values->>'boys_bailed' boys_bailed,
+        a.values->>'girls_bailed' girls_bailed,
+        (a.values->>'bailed')::int bailed,
+        a.values->>'boys_releasedfreely' boys_releasedfreely,
+        a.values->>'girls_releasedfreely' girls_releasedfreely,
+        (a.values->>'releasedfreely')::int releasedfreely,
+        a.values->>'boys_releasedin48hrs' boys_releasedin48hrs,
+        a.values->>'girls_releasedin48hrs' girls_releasedin48hrs,
+        (a.values->>'releasedin48hrs')::int releasedin48hrs,
+        (a.values->>'total_cases')::int total_cases
+    FROM
+        flow_data a
+        LEFT OUTER JOIN locations AS b ON a.district = b.id
+        LEFT OUTER JOIN locations AS c ON a.region = c.id
+        LEFT OUTER JOIN police_stations AS d ON a.station = d.id
+    WHERE
+        a.report_type = 'diversion'
+    ORDER BY
+        year desc, month desc, region, district;
+
+
 
 -- MORE QUERIES DERIVED
 -- Individual cases in a region
@@ -118,8 +158,9 @@ CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
     SELECT
         a.month, a.year, a.report_type, a.msisdn,
         1 AS nation,
-        b.name AS district,
         c.name AS region,
+        c.id AS region_id,
+        b.name AS district,
         d.name AS court,
         d.longitude, d.latitude,
         (a.values->>'fromprevmonth_cvc')::int fromprevmonth_cvc,
@@ -282,3 +323,44 @@ CREATE VIEW pvsu_cases_by_region_view AS
         END)::NUMERIC AS latitude
     FROM flow_data_pvsu_view
     GROUP BY region, month, rdate;
+
+DROP VIEW IF EXISTS ncjf_casetypes_national_view;
+CREATE VIEW ncjf_casetypes_national_view AS
+    SELECT
+        sum(fromprevmonth_cvc) fromprevmonth_cvc,
+        sum(newlyregistered_cvc) newlyregistered_cvc,
+        sum(newlyregconcluded_cvc) newlyregconcluded_cvc,
+        sum(concluded_cvc) concluded_cvc,
+
+        sum(fromprevmonth_cbc) fromprevmonth_cbc,
+        sum(newlyregistered_cbc) newlyregistered_cbc,
+        sum(newlyregconcluded_cbc) newlyregconcluded_cbc,
+        sum(concluded_cbc) concluded_cbc,
+
+        sum(fromprevmonth_inconflict) fromprevmonth_inconflict,
+        sum(newlyregistered_inconflict) newlyregistered_inconflict,
+        sum(newlyregconcluded_inconflict) newlyregconcluded_inconflict,
+        sum(concluded_inconflict) concluded_inconflict,
+        month, year
+    FROM
+        flow_data_ncjf_view group by month, year;
+
+DROP VIEW IF EXISTS ncjf_childcases_view;
+CREATE VIEW ncjf_childcases_view AS
+    SELECT
+        casetype,
+        (json_values->>'fromprevmonth')::int fromprevmonth,
+        (json_values->>'newlyregistered')::int newlyregistered,
+        (json_values->>'newlyregconcluded')::int newlyregconcluded,
+        (json_values->>'concluded')::int concluded,
+        month,
+        year,
+        (month || '-28')::date rdate
+    FROM
+        summary_cases
+    WHERE
+        report_type = 'ncjf'
+        AND
+        summary_slug = 'child_cases'
+        AND
+        summary_for = 'nation';

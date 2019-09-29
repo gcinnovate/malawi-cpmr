@@ -104,6 +104,7 @@ class SummaryCases(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     casetype = db.Column(db.String(), index=True)
     value = db.Column(db.Integer)
+    json_values = db.Column(JSONB, index=True)
     region = db.Column(db.Integer, db.ForeignKey('locations.id'))
     district = db.Column(db.Integer, db.ForeignKey('locations.id'))
     station = db.Column(db.Integer, db.ForeignKey('police_stations.id'))
