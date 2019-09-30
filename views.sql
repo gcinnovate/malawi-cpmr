@@ -34,7 +34,14 @@ CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
         (a.values->>'men_total')::int men_total,
         (a.values->>'women_total')::int women_total,
         created,
-        (a.month || '-28')::date rdate,
+        CASE
+            WHEN a.month ~ '(0[13578]|1[02])$' THEN
+                (a.month || '-31')::date
+            WHEN a.month ~ '(0[469]|1[1])$' THEN
+                (a.month || '-30')::date
+            ELSE
+                (a.month || '-28')::date
+        END AS rdate,
         'Malawi'::text AS nation
     FROM
         flow_data a
@@ -60,7 +67,14 @@ CREATE OR REPLACE VIEW flow_data_diversion_view  AS
         (a.values->>'releasedin48hrs')::int releasedin48hrs,
         (a.values->>'total_cases')::int total_cases,
         created,
-        (a.month || '-28')::date rdate
+        CASE
+            WHEN a.month ~ '(0[13578]|1[02])$' THEN
+                (a.month || '-31')::date
+            WHEN a.month ~ '(0[469]|1[1])$' THEN
+                (a.month || '-30')::date
+            ELSE
+                (a.month || '-28')::date
+        END AS rdate
     FROM
         flow_data a
         LEFT OUTER JOIN locations AS b ON a.district = b.id
@@ -205,7 +219,14 @@ CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
         (a.values->>'caseswithdrawn')::int caseswithdrawn,
         (a.values->>'referredchildsurvivors')::int referredchildsurvivors,
         created,
-        (a.month || '-01')::date rdate
+        CASE
+            WHEN a.month ~ '(0[13578]|1[02])$' THEN
+                (a.month || '-31')::date
+            WHEN a.month ~ '(0[469]|1[1])$' THEN
+                (a.month || '-30')::date
+            ELSE
+                (a.month || '-28')::date
+        END AS rdate
     FROM
         flow_data a
         LEFT OUTER JOIN locations AS b ON a.district = b.id
@@ -258,7 +279,14 @@ CREATE OR REPLACE VIEW summary_cases_view  AS
         c.name AS region,
         d.name AS police_station,
         d.longitude, d.latitude,
-        (a.month || '-28')::date rdate
+        CASE
+            WHEN a.month ~ '(0[13578]|1[02])$' THEN
+                (a.month || '-31')::date
+            WHEN a.month ~ '(0[469]|1[1])$' THEN
+                (a.month || '-30')::date
+            ELSE
+                (a.month || '-28')::date
+        END AS rdate
     FROM
         summary_cases a
         LEFT OUTER JOIN locations AS b ON a.district = b.id
@@ -355,7 +383,14 @@ CREATE VIEW ncjf_childcases_view AS
         (json_values->>'concluded')::int concluded,
         month,
         year,
-        (month || '-28')::date rdate
+        CASE
+            WHEN month ~ '(0[13578]|1[02])$' THEN
+                (month || '-31')::date
+            WHEN month ~ '(0[469]|1[1])$' THEN
+                (month || '-30')::date
+            ELSE
+                (month || '-28')::date
+        END AS rdate
     FROM
         summary_cases
     WHERE
