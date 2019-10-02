@@ -105,6 +105,7 @@ def initdb():
     districts = Location.query.filter_by(level=3).all()
     for d in districts:
         db.session.add(PoliceStation(name=d.name, district_id=d.id))
+        db.session.add(JusticeCourt(name=d.name, district_id=d.id))
 
     blantyre = Location.query.filter_by(name='Blantyre', level=3).all()[0]
     db.session.add(PoliceStation(name='Chileka', district_id=blantyre.id))
@@ -181,9 +182,13 @@ def load_test_data(report, start_year, end_year, start_month, end_month, init):
                     values['girls_total'] = girls_total
                     values['men_total'] = men_total
                     values['women_total'] = women_total
-                db.session.add(FlowData(
-                    region=region_id, district=district_id, station=p.id, month=month_str,
-                    year=y, report_type=report, values=values))
+                flow_data_obj = FlowData.query.filter_by(
+                    year=y, month=month_str, region=region_id, district=district_id,
+                    station=p.id, report_type=report).first()
+                if not flow_data_obj:
+                    db.session.add(FlowData(
+                        region=region_id, district=district_id, station=p.id, month=month_str,
+                        year=y, report_type=report, values=values))
                 click.echo(values)
             db.session.commit()
 
@@ -192,13 +197,18 @@ def load_test_data(report, start_year, end_year, start_month, end_month, init):
 @click.option('--report', '-r', default='ncjf')
 @click.option('--start-year', '-s', default=2016)
 @click.option('--end-year', '-e', default=2020)
-def load_test_data2(report, start_year, end_year):
+@click.option('--start-month', '-m', default=1)
+@click.option('--end-month', '-n', default=13)
+@click.option('--init', '-i', default=0)
+def load_test_data2(report, start_year, end_year, start_month, end_month, init):
     from config import INDICATOR_CATEGORY_MAPPING, INDICATOR_THRESHOLD
     print(report)
     justice_courts = JusticeCourt.query.all()
     year = datetime.now().year
+    if start_year == end_year:
+        end_year += 1
     for y in range(start_year, end_year):
-        for m in range(1, 13):
+        for m in range(start_month, end_month):
             if y == year and m > datetime.now().month - 1:
                 continue
             click.echo("{0}-{1:02}".format(y, m))
@@ -212,21 +222,31 @@ def load_test_data2(report, start_year, end_year):
                     indcators_total = 0
                     if not v:  # if indicator has no sub categories!
                         field = "{0}".format(k)
-                        val = random.choice(range(INDICATOR_THRESHOLD[k]))
+                        if init:
+                            val = 0
+                        else:
+                            val = random.choice(range(INDICATOR_THRESHOLD[k]))
                         values[field] = val
                         continue
 
                     for ind in v:
                         field = "{0}_{1}".format(ind, k)
-                        val = random.choice(range(INDICATOR_THRESHOLD[k]))
+                        if init:
+                            val = 0
+                        else:
+                            val = random.choice(range(INDICATOR_THRESHOLD[k]))
                         values[field] = val
                         indcators_total += val
                     values[k] = indcators_total
                     total_cases += indcators_total
                 values['total_cases'] = total_cases
-                db.session.add(FlowData(
-                    region=region_id, district=district_id, court=p.id, month=month_str,
-                    year=y, report_type=report, values=values))
+                flow_data_obj = FlowData.query.filter_by(
+                    year=y, month=month_str, region=region_id, district=district_id,
+                    court=p.id, report_type=report).first()
+                if not flow_data_obj:  # only create entry if none is existing
+                    db.session.add(FlowData(
+                        region=region_id, district=district_id, court=p.id, month=month_str,
+                        year=y, report_type=report, values=values))
                 click.echo(values)
             db.session.commit()
 
