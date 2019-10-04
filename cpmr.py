@@ -2,6 +2,7 @@ import os
 # import sys
 import string
 import random
+from openpyxl import load_workbook
 import click
 from dotenv import load_dotenv
 from flask_migrate import Migrate, upgrade
@@ -9,7 +10,7 @@ from app import create_app, db, redis_client
 from app.models import (
     Location, LocationTree, PoliceStation, User, Role,
     FlowData, JusticeCourt, SummaryCases)
-from datetime import datetime
+import datetime
 from flask import current_app
 from sqlalchemy.sql import text
 from getpass import getpass
@@ -138,12 +139,12 @@ def load_test_data(report, start_year, end_year, start_month, end_month, init):
     from config import INDICATOR_CATEGORY_MAPPING, INDICATOR_THRESHOLD
     # print(report)
     police_stations = PoliceStation.query.all()
-    year = datetime.now().year
+    year = datetime.datetime.now().year
     if start_year == end_year:
         end_year += 1
     for y in range(start_year, end_year):
         for m in range(start_month, end_month):
-            if y == year and m > datetime.now().month - 1:
+            if y == year and m > datetime.datetime.now().month - 1:
                 continue
             click.echo("{0}-{1:02}".format(y, m))
             for p in police_stations:
@@ -204,12 +205,12 @@ def load_test_data2(report, start_year, end_year, start_month, end_month, init):
     from config import INDICATOR_CATEGORY_MAPPING, INDICATOR_THRESHOLD
     print(report)
     justice_courts = JusticeCourt.query.all()
-    year = datetime.now().year
+    year = datetime.datetime.now().year
     if start_year == end_year:
         end_year += 1
     for y in range(start_year, end_year):
         for m in range(start_month, end_month):
-            if y == year and m > datetime.now().month - 1:
+            if y == year and m > datetime.datetime.now().month - 1:
                 continue
             click.echo("{0}-{1:02}".format(y, m))
             for p in justice_courts:
@@ -371,3 +372,85 @@ def refresh_pvsu_casetypes():
                 report_type='ncjf', summary_for='nation', summary_slug='child_cases')
             db.session.add(s)
         db.session.commit()
+
+
+@app.cli.command("load_legacy_data")
+@click.option('--filename', '-f')
+@click.option('--report', '-r', default='pvsu')
+def load_legacy_data(filename, report):
+    click.echo("going to proccess the file: {0} for upload".format(filename))
+
+    def get_last_month(date_time_obj):
+        dt1 = date_time_obj.replace(day=1, hour=0, minute=0, second=0)
+        dt2 = dt1 - datetime.timedelta(days=1)
+        return dt2.strftime('%Y-%m')
+
+    locs = Location.query.filter_by(level=3).all()
+    districts = {}
+    for l in locs:
+        districts[l.id] = {'name': l.name, 'parent_id': l.parent_id}
+    click.echo(districts)
+    click.echo("======>")
+
+    stations = PoliceStation.query.all()
+    police_stations = {}
+    for s in stations:
+        police_stations[s.name] = {'id': s.id, 'district_id': s.district_id}
+
+    click.echo(police_stations)
+    click.echo("======>")
+
+    wb = load_workbook(filename, read_only=True)
+    for sheet in wb:
+        # print sheet.title
+        data = []
+        headings = []
+        j = 0
+        for row in sheet.rows:
+            if j > 0:
+                # val = ['%s' % i.value for i in row]
+                val = [u'' if i.value is None else str(i.value) for i in row]
+                # print val
+                data.append(val)
+            else:
+                headings = [u'' if i.value is None else str(i.value) for i in row]
+            j += 1
+
+        click.echo(headings)
+        # click.echo(data[:10])
+        for d in data:
+            values = {}
+            for idx, v in enumerate(d):
+                if idx == 0:
+                    reporting_month = d[0].split(' ')[0]
+                    date_time_obj = datetime.datetime.strptime(reporting_month, '%Y-%m-%d')
+                    month = get_last_month(date_time_obj)
+                    year = month.split('-')[0]
+                    print("====>", date_time_obj, month, year)
+
+                if idx == 1:
+                    station = d[1].strip()
+                    if report in ('pvsu', 'diversion'):
+                        police_station = police_stations[station]['id']
+                        district = police_stations[station]['district_id']
+                        region = districts[district]['parent_id']
+                        print("Station====>", police_station, " District: ", district, " Region: ", region)
+
+                if idx > 1:
+                    values[headings[idx]] = d[idx]
+
+            flow_data_obj = FlowData.query.filter_by(
+                year=year, month=month, report_type=report, region=region, district=district,
+                station=police_station).first()
+            if flow_data_obj:
+                # click.echo("+++++++++++++")
+                # click.echo(flow_data_obj.values)
+                # click.echo("--------------")
+                new_values_obj = flow_data_obj.values.copy()
+                for key, val in values.items():
+                    new_values_obj[key] = val
+
+                # click.echo(new_values_obj)
+                flow_data_obj.values = new_values_obj
+                print("XXXXXXXXX=>", flow_data_obj.id, flow_data_obj.year)
+                db.session.commit()
