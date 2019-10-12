@@ -135,7 +135,8 @@ def initdb():
 @click.option('--start-month', '-m', default=1)
 @click.option('--end-month', '-n', default=13)
 @click.option('--init', '-i', default=0)
-def load_test_data(report, start_year, end_year, start_month, end_month, init):
+@click.option('--limit', '-x', default="yes")  # whether to limit on years to create data for
+def load_test_data(report, start_year, end_year, start_month, end_month, init, limit):
     from config import INDICATOR_CATEGORY_MAPPING, INDICATOR_THRESHOLD
     # print(report)
     police_stations = PoliceStation.query.all()
@@ -145,7 +146,10 @@ def load_test_data(report, start_year, end_year, start_month, end_month, init):
     for y in range(start_year, end_year):
         for m in range(start_month, end_month):
             if y == year and m > datetime.datetime.now().month - 1:
-                continue
+                if limit == "yes":
+                    continue
+                else:
+                    pass
             click.echo("{0}-{1:02}".format(y, m))
             for p in police_stations:
                 district_id = p.district_id
@@ -201,7 +205,8 @@ def load_test_data(report, start_year, end_year, start_month, end_month, init):
 @click.option('--start-month', '-m', default=1)
 @click.option('--end-month', '-n', default=13)
 @click.option('--init', '-i', default=0)
-def load_test_data2(report, start_year, end_year, start_month, end_month, init):
+@click.option('--limit', '-x', default="yes")  # whether to limit on years to create data for
+def load_test_data2(report, start_year, end_year, start_month, end_month, init, limit):
     from config import INDICATOR_CATEGORY_MAPPING, INDICATOR_THRESHOLD
     print(report)
     justice_courts = JusticeCourt.query.all()
@@ -211,13 +216,18 @@ def load_test_data2(report, start_year, end_year, start_month, end_month, init):
     for y in range(start_year, end_year):
         for m in range(start_month, end_month):
             if y == year and m > datetime.datetime.now().month - 1:
-                continue
+                if limit == "yes":
+                    continue
+                else:
+                    pass
             click.echo("{0}-{1:02}".format(y, m))
             for p in justice_courts:
                 district_id = p.district_id
                 region_id = Location.query.filter_by(id=district_id).first().parent_id
                 month_str = "{0}-{1:02}".format(y, m)
                 total_cases = 0
+                total_childcases = 0
+                total_concluded = 0
                 values = {}
                 for k, v in INDICATOR_CATEGORY_MAPPING.get(report).items():
                     indcators_total = 0
@@ -238,8 +248,14 @@ def load_test_data2(report, start_year, end_year, start_month, end_month, init):
                             val = random.choice(range(INDICATOR_THRESHOLD[k]))
                         values[field] = val
                         indcators_total += val
+                        if ind in ('fromprevmonth', 'newlyregistered'):
+                            total_childcases += val
+                        if ind in ('concluded'):
+                            total_concluded += val
                     values[k] = indcators_total
                     total_cases += indcators_total
+                    values['total_childcases'] = total_childcases
+                    values['concluded'] = total_concluded
                 values['total_cases'] = total_cases
                 flow_data_obj = FlowData.query.filter_by(
                     year=y, month=month_str, region=region_id, district=district_id,
@@ -338,6 +354,31 @@ def refresh_pvsu_casetypes():
             s = SummaryCases(
                 casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
                 region=r[4], report_type='pvsu', summary_for='region', summary_slug='demography')
+            db.session.add(s)
+        db.session.commit()
+
+    results = db.engine.execute("SELECT * from ncjf_childvictim_categories_view ORDER BY year desc, month desc;")
+    records = []
+    for row in results:
+        month = row['month']
+        year = row['year']
+        for k in results.keys():
+            if k in ('month', 'year'):
+                continue
+            casetype, cases = (k, row[k])
+            records.append((casetype, cases, month, year))
+
+    print(records)
+    for r in records:
+        summary = SummaryCases.query.filter_by(
+            casetype=r[0], month=r[2], year=r[3],
+            report_type='ncjf', summary_for='nation', summary_slug='child_cases').first()
+        if summary:
+            summary.value = r[1]
+        else:
+            s = SummaryCases(
+                casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
+                report_type='ncjf', summary_for='nation', summary_slug='childvictim_categories')
             db.session.add(s)
         db.session.commit()
 

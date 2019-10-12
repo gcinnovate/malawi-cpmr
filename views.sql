@@ -1,6 +1,9 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
+DROP VIEW IF EXISTS ncjf_childvictim_cases_stats_view;
+DROP VIEW IF EXISTS ncjf_chilcases_concluded_by_courts;
 DROP VIEW IF EXISTS ncjf_childcases_view;
 DROP VIEW IF EXISTS ncjf_casetypes_national_view;
+DROP VIEW IF EXISTS ncjf_childvictim_categories_view;
 DROP VIEW IF EXISTS cases_dealtwith_regional_view;
 DROP VIEW IF EXISTS cases_dealtwith_national_view;
 DROP VIEW IF EXISTS cases_by_police_station;
@@ -8,6 +11,7 @@ DROP VIEW IF EXISTS pvsu_cases_by_region_view;
 DROP VIEW IF EXISTS pvsu_casetypes_regional_view;
 DROP VIEW IF EXISTS pvsu_cases_demographics_regional_view;
 DROP VIEW IF EXISTS flow_data_pvsu_view;
+-- view for all pvsu data
 CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
     SELECT
         a.month, a.year, a.report_type, a.msisdn,
@@ -51,6 +55,7 @@ CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
     WHERE
         a.report_type = 'pvsu';
 
+-- view for diversion data total per category
 DROP VIEW IF EXISTS flow_data_diversion_view;
 CREATE OR REPLACE VIEW flow_data_diversion_view  AS
     SELECT
@@ -83,6 +88,7 @@ CREATE OR REPLACE VIEW flow_data_diversion_view  AS
     WHERE
         a.report_type = 'diversion';
 
+-- view for all the diversion data
 DROP VIEW IF EXISTS diversion_data_view;
 CREATE OR REPLACE VIEW diversion_data_view  AS
     SELECT
@@ -167,6 +173,7 @@ CREATE VIEW cases_by_police_station AS
     GROUP BY flow_data_pvsu_view.police_station
      ORDER BY flow_data_pvsu_view.police_station;
 
+-- view for all NCJF data
 DROP VIEW IF EXISTS flow_data_ncjf_view;
 CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
     SELECT
@@ -177,6 +184,10 @@ CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
         b.name AS district,
         d.name AS court,
         d.longitude, d.latitude,
+        (a.values->>'defilement_cvccategory')::int defilement_cvccategory,
+        (a.values->>'childmarriage_cvccategory')::int childmarriage_cvccategory,
+        (a.values->>'childtrafficking_cvccategory')::int childtrafficking_cvccategory,
+        (a.values->>'sexualviolence_cvccategory')::int sexualviolence_cvccategory,
         (a.values->>'fromprevmonth_cvc')::int fromprevmonth_cvc,
         (a.values->>'newlyregistered_cvc')::int newlyregistered_cvc,
         (a.values->>'newlyregconcluded_cvc')::int newlyregconcluded_cvc,
@@ -192,6 +203,8 @@ CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
         (a.values->>'newlyregconcluded_inconflict')::int newlyregconcluded_inconflict,
         (a.values->>'concluded_inconflict')::int concluded_inconflict,
         (a.values->>'inconflict')::int inconflict,
+        (a.values->>'concluded')::int concluded,
+        (a.values->>'total_childcases')::int total_childcases,
         (a.values->>'childmaintenance_cbctype')::int childmaintenance_cbctype,
         (a.values->>'childcustody_cbctype')::int childcustody_cbctype,
         (a.values->>'childfosterage_cbctype')::int childfosterage_cbctype,
@@ -256,6 +269,7 @@ CREATE VIEW pvsu_casetypes_regional_view AS
     FROM flow_data_pvsu_view
     GROUP BY month, year, region_id;
 
+-- view for pvsu demographics data at regional level
 DROP VIEW IF EXISTS pvsu_cases_demographics_regional_view;
 CREATE VIEW pvsu_cases_demographics_regional_view AS
     SELECT
@@ -268,6 +282,7 @@ CREATE VIEW pvsu_cases_demographics_regional_view AS
     GROUP BY month, year, region_id;
 
 
+-- view for summary_cases table used for pie chart data
 DROP VIEW IF EXISTS summary_cases_view;
 CREATE OR REPLACE VIEW summary_cases_view  AS
     SELECT
@@ -294,6 +309,7 @@ CREATE OR REPLACE VIEW summary_cases_view  AS
         LEFT OUTER JOIN police_stations AS d ON a.station = d.id
         LEFT OUTER JOIN justice_courts AS e ON a.court = e.id;
 
+-- view for diversion cases dealt with at national level
 DROP VIEW IF EXISTS cases_dealtwith_national_view;
 CREATE VIEW cases_dealtwith_national_view AS
     SELECT
@@ -320,6 +336,7 @@ CREATE VIEW cases_dealtwith_national_view AS
     GROUP BY month, region, rdate
     ORDER BY month, region;
 
+-- view for diversion cases dealt with at regional level
 DROP VIEW IF EXISTS cases_dealtwith_regional_view;
 CREATE VIEW cases_dealtwith_regional_view AS
     SELECT
@@ -333,6 +350,7 @@ CREATE VIEW cases_dealtwith_regional_view AS
     GROUP BY
         month, police_station, region, rdate, longitude, latitude;
 
+-- view for PVSU cases by regions
 DROP VIEW IF EXISTS pvsu_cases_by_region_view;
 CREATE VIEW pvsu_cases_by_region_view AS
     SELECT region, sum(total_cases) total_cases, rdate, month,
@@ -373,6 +391,18 @@ CREATE VIEW ncjf_casetypes_national_view AS
     FROM
         flow_data_ncjf_view group by month, year;
 
+-- view for the sum of child victim cases by category, for pie chart data
+DROP VIEW IF EXISTS ncjf_childvictim_categories_view;
+CREATE VIEW ncjf_childvictim_categories_view AS
+    SELECT
+        sum(defilement_cvccategory) defilement,
+        sum(childmarriage_cvccategory) childmarriage,
+        sum(childtrafficking_cvccategory) childtrafficking,
+        sum(sexualviolence_cvccategory) sexualviolence,
+        month, year
+    FROM
+        flow_data_ncjf_view group by month, year;
+
 DROP VIEW IF EXISTS ncjf_childcases_view;
 CREATE VIEW ncjf_childcases_view AS
     SELECT
@@ -399,3 +429,68 @@ CREATE VIEW ncjf_childcases_view AS
         summary_slug = 'child_cases'
         AND
         summary_for = 'nation';
+
+DROP VIEW IF EXISTS ncjf_chilcases_concluded_by_courts;
+CREATE VIEW ncjf_chilcases_concluded_by_courts AS
+    SELECT
+        CASE
+            WHEN sum(total_childcases) > 0 THEN
+                round((((sum(concluded)+0.0)/sum(total_childcases))*100)::numeric, 2)
+            ELSE 0
+        END AS cases_concluded,
+        month, court, rdate, longitude, latitude
+    FROM
+        flow_data_ncjf_view
+    GROUP BY
+        month, court, rdate, longitude, latitude
+    ORDER by rdate DESC, court;
+
+DROP VIEW IF EXISTS ncjf_childvictim_cases_stats_view;
+CREATE VIEW ncjf_childvictim_cases_stats_view AS
+    SELECT
+        sum(imprisoned_perpetrators) imprisoned,
+        sum(acquited_perpetrators) acquited,
+        sum(fined_perpetrators) fined,
+        CASE
+            WHEN sum(cvc) > 0 THEN -- total child victim cases
+                round((((sum(caseswithdrawn)+0.0)/sum(cvc))*100)::numeric, 2)
+            ELSE
+                0
+        END AS caseswithdrawn,
+        CASE
+            WHEN sum(cvc) > 0 THEN -- total child victim cases
+                round((((sum(referredchildsurvivors)+0.0)/sum(cvc))*100)::numeric, 2)
+            ELSE
+                0
+        END AS referredchildsurvivors,
+
+        CASE
+            WHEN sum(inconflict) > 0 THEN -- total child victim cases
+                round((((sum(bailed)+0.0)/sum(inconflict))*100)::numeric, 2)
+            ELSE
+                0
+        END AS bailed,
+        sum(preliminaryinquiry_diverted) preliminaryinquiry_diverted,
+        sum(aftertrial_diverted) aftertrial_diverted,
+        CASE
+            WHEN sum(inconflict) > 0 THEN -- total child victim cases
+                round((((sum(reformatories_custodialorder)+0.0)/sum(inconflict))*100)::numeric, 2)
+            ELSE
+                0
+        END AS reformatories_custodialorder,
+        sum(prisons_custodialorder) prisons_custodialorder,
+        --
+        sum(safetyhomes_remanded) safetyhomes_remanded,
+        sum(reformatorycentres_remanded) reformatorycentres_remanded,
+        sum(policecells_remanded) policecells_remanded,
+        CASE
+            WHEN sum(inconflict) > 0 THEN -- total child victim cases
+                round((((sum(specialreferrals)+0.0)/sum(inconflict))*100)::numeric, 2)
+            ELSE
+                0
+        END AS specialreferrals,
+        month, rdate
+    FROM
+        flow_data_ncjf_view
+    GROUP BY month, rdate
+    ORDER BY month DESC;

@@ -79,6 +79,8 @@ INDICATORS = {
     'ncjf': [
         'month',
         'fromprevmonth_cvc', 'newlyregistered_cvc', 'newlyregconcluded_cvc', 'concluded_cvc',
+        'defilement_cvccategory', 'childmarriage_cvccategory', 'childtrafficking_cvccategory',
+        'sexualviolence_cvccategory', 'concluded', 'total_childcases',
         'cvc', 'imprisoned_perpetrators', 'acquited_perpetrators', 'fined_perpetrators',
         'perpetrators', 'caseswithdrawn', 'referredchildsurvivors', 'fromprevmonth_cbc',
         'newlyregistered_cbc', 'newlyregconcluded_cbc', 'concluded_cbc', 'cbc',
@@ -88,6 +90,8 @@ INDICATORS = {
         'preliminaryenquiry_diverted', 'aftertrial_diverted', 'diverted', 'bailed',
         'total_custodialorder', 'reformatories_custodialorder', 'prisons_custodialorder', 'remanded_total',
         'safetyhomes_remanded', 'reformatorycentres_remanded', 'policecells_remanded', 'specialreferrals',
+    ],
+    'cvsu': [
     ]
 }
 
@@ -100,7 +104,12 @@ REPORT_AGGREGATE_INIDICATORS = {
     'diversion': [
         'arrested', 'divertedatpolice', 'takentocourt', 'bailed',
         'releasedfreely', 'releasedin48hrs'
-    ]
+    ],
+    'ncjf': [
+        'perpetrators', 'cbc', 'cvc', 'inconflict'
+    ],
+    'cvsu': [
+    ],
 }
 
 # The following are used for generating dummy data
@@ -134,6 +143,7 @@ INDICATOR_CATEGORY_MAPPING = {
         'cbctype': [
             'childmaintenance', 'childcustody', 'childfosterage', 'childadoption',
             'childparentage', 'childguardianship', 'childaccess', 'estatedistribution'],
+        'cvccategory': ['defilement', 'childmarriage', 'childtrafficking', 'sexualviolence'],
         'inconflict': ['fromprevmonth', 'newlyregistered', 'newlyregconcluded', 'concluded'],
         'custodialorder': ['total', 'reformatories', 'prisons'],
         'remanded': ['total', 'safetyhomes', 'reformatorycentres', 'policecells'],
@@ -143,7 +153,11 @@ INDICATOR_CATEGORY_MAPPING = {
         'specialreferrals': [],
         'caseswithdrawn': [],
         'referredchildsurvivors': [],
+        'concluded': [],
+        'total_childcases': []
 
+    },
+    'cvsu': {
     }
 }
 
@@ -173,11 +187,14 @@ INDICATOR_THRESHOLD = {
     'cvc': 200,
     'cbctype': 300,
     'cbc': 150,
+    'cvccategory': 80,
     'inconflict': 75,
     'custodialorder': 55,
     'remanded': 25,
     'diverted': 15,
-    'perpetrators': 60
+    'perpetrators': 60,
+    'concluded': 200,
+    'total_childcases': 180
 }
 
 INDICATOR_NAME_MAPPING = {
@@ -189,10 +206,13 @@ INDICATOR_NAME_MAPPING = {
     'humantrafficking': 'Human trafficking',
     'kidnapping': 'Kidnapping',
     'sexualoffences': 'Other sexual violence',
+    'sexualviolence': 'Sexual violence',
     'maritalconflict': 'Marital and interpersonal conflict',
     'childneglect': 'Child neglect',
     'economicabuse': 'Economic abuse',
     'breachofpeace': 'Conduct likely to cause breach of peace',
+    'childtrafficking': 'Child Trafficking',
+    'childmarriage': 'Child Marriage',
     # demorgraphics
     'boys_total': 'Boys',
     'girls_total': 'Girls',
