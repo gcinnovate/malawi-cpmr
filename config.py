@@ -48,6 +48,8 @@ config = {
     'default': DevelopmentConfig
 }
 
+
+# Flows and their associated flow variables. keys represent flows
 INDICATORS = {
     'pvsu': [
         'month', 'physicalviolence', 'suicide', 'defilement', 'rape', 'indecentassault',
@@ -161,7 +163,7 @@ INDICATOR_CATEGORY_MAPPING = {
     }
 }
 
-# the guide random generation
+# the guide random generation for the flow variables
 INDICATOR_THRESHOLD = {
     'physicalviolence': random.randint(0, 100),
     'suicide': random.randint(0, 20),
@@ -196,7 +198,7 @@ INDICATOR_THRESHOLD = {
     'concluded': 200,
     'total_childcases': 180
 }
-
+# a mapping of flow variables to their readable description
 INDICATOR_NAME_MAPPING = {
     'physicalviolence': 'Physical Violence',
     'suicide': 'Suicide',
@@ -220,3 +222,6 @@ INDICATOR_NAME_MAPPING = {
     'women_total': 'Women',
 
 }
+
+# Flow names that use a month generated from reporting date
+AUTO_MONTH_FLOWS = ['ncjf']

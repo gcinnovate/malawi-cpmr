@@ -3,7 +3,7 @@ from flask_mail import Mail
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from celery import Celery
-from config import config, Config, INDICATORS, REPORT_AGGREGATE_INIDICATORS
+from config import config, Config, INDICATORS, REPORT_AGGREGATE_INIDICATORS, AUTO_MONTH_FLOWS
 from flask_login import LoginManager
 from flask_redis import FlaskRedis
 

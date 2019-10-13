@@ -1,4 +1,4 @@
-from . import redis_client, db, REPORT_AGGREGATE_INIDICATORS
+from . import redis_client, db, REPORT_AGGREGATE_INIDICATORS, AUTO_MONTH_FLOWS
 
 
 def get_indicators_from_rapidpro_results(results_json, indicator_conf={}, report_type=None):
@@ -15,7 +15,10 @@ def get_indicators_from_rapidpro_results(results_json, indicator_conf={}, report
     for k, v in results_json.items():
         if k in report_type_indicators:
             if k == 'month':
-                flow_inidicators[k] = results_json[k]['category']
+                if report_type in AUTO_MONTH_FLOWS:
+                    flow_inidicators[k] = results_json[k]['value']
+                else:
+                    flow_inidicators[k] = results_json[k]['category']
             else:
                 try:
                     flow_inidicators[k] = int(results_json[k]['value'])
@@ -33,10 +36,11 @@ def get_indicators_from_rapidpro_results(results_json, indicator_conf={}, report
             elif k.startswith('women_'):
                 women_total += int(results_json[k]['value'])
 
-    flow_inidicators['total_cases'] = total_cases
+    if report_type in ('pvsu', 'diversion'):
+        flow_inidicators['total_cases'] = total_cases
 
-    flow_inidicators['boys_total'] = boys_total
-    flow_inidicators['girls_total'] = girls_total
-    flow_inidicators['men_total'] = men_total
-    flow_inidicators['women_total'] = women_total
+        flow_inidicators['boys_total'] = boys_total
+        flow_inidicators['girls_total'] = girls_total
+        flow_inidicators['men_total'] = men_total
+        flow_inidicators['women_total'] = women_total
     return flow_inidicators
