@@ -94,6 +94,29 @@ INDICATORS = {
         'safetyhomes_remanded', 'reformatorycentres_remanded', 'policecells_remanded', 'specialreferrals',
     ],
     'cvsu': [
+        'month', 'physicalviolence', 'defilement', 'sexualviolence', 'childneglect', 'childmarriage',
+        'emotionalabuse', 'economicexploitation', 'economicabuse', 'maritalconflict', 'humantrafficking',
+        'boys_physicalviolence', 'girls_physicalviolence', 'men_physicalviolence', 'women_physicalviolence',
+        'girls_defilement',
+        'boys_sexualviolence', 'girls_sexualviolence', 'men_sexualviolence', 'women_sexualviolence',
+        'boys_childneglect', 'girls_childneglect',
+        'boys_childmarriage', 'girls_childmarriage',
+        'boys_emotionalabuse', 'girls_emotionalabuse', 'men_emotionalabuse', 'women_emotionalabuse',
+        'boys_economicexploitation', 'girls_economicexploitation', 'men_economicexploitation',
+        'women_economicexploitation',
+        'boys_humantrafficking', 'girls_humantrafficking', 'men_humantrafficking', 'women_humantrafficking',
+        'boys_economicabuse', 'girls_economicabuse', 'men_economicabuse', 'women_economicabuse',
+        'boys_maritalconflict', 'girls_maritalconflict', 'men_maritalconflict', 'women_maritalconflict',
+
+    ],
+    'cc': [
+        'month', 'attendance', 'violence', 'referred',
+        'boys_attendace', 'girls_attendance',
+        'boys_violence', 'girls_violence',
+        'boys_referred', 'girls_referred',
+        'men_trainedfacilitators', 'women_trainedfacilitators',
+        'men_nontrainedfacilitators', 'women_nontrainedfacilitators',
+        'trainedfacilitators', 'nontrainedfacilitators'
     ]
 }
 
@@ -111,7 +134,13 @@ REPORT_AGGREGATE_INIDICATORS = {
         'perpetrators', 'cbc', 'cvc', 'inconflict'
     ],
     'cvsu': [
+        'physicalviolence', 'defilement', 'childneglect', 'childmarriage', 'economicabuse',
+        'economicexploitation', 'maritalconflict', 'sexualviolence', 'humantrafficking',
+        'emotionalabuse'
     ],
+    'cc': [
+        'attendance', 'violence', 'referred'
+    ]
 }
 
 # The following are used for generating dummy data
@@ -160,6 +189,24 @@ INDICATOR_CATEGORY_MAPPING = {
 
     },
     'cvsu': {
+        'physicalviolence': ['boys', 'girls', 'men', 'women'],
+        'defilement': ['girls'],
+        'sexualviolence': ['boys', 'girls', 'men', 'women'],
+        'humantrafficking': ['boys', 'girls', 'men', 'women'],
+        'childneglect': ['boys', 'girls'],
+        'childmarriage': ['boys', 'girls'],
+        'economicexploitation': ['boys', 'girls', 'men', 'women'],
+        'economicabuse': ['boys', 'girls', 'men', 'women'],
+        'emotionalabuse': ['boys', 'girls', 'men', 'women'],
+        'maritalconflict': ['boys', 'girls', 'men', 'women'],
+    },
+    'cc': {
+        'attendance': ['boys', 'girls'],
+        'violence': ['boys', 'girls'],
+        'referred': ['boys', 'girls'],
+        'trainedfacilitators': ['men', 'women'],
+        'nontrainedfacilitators': ['men', 'women'],
+
     }
 }
 
@@ -196,7 +243,14 @@ INDICATOR_THRESHOLD = {
     'diverted': 15,
     'perpetrators': 60,
     'concluded': 200,
-    'total_childcases': 180
+    'total_childcases': 180,
+    'sexualviolence': 40,
+    'emotionalabuse': 70,
+    'economicexploitation': 55,
+    'childmarriage': 30,
+    'referred': 54,
+    'violence': 70,
+    'attendance': 150
 }
 # a mapping of flow variables to their readable description
 INDICATOR_NAME_MAPPING = {
@@ -215,6 +269,10 @@ INDICATOR_NAME_MAPPING = {
     'breachofpeace': 'Conduct likely to cause breach of peace',
     'childtrafficking': 'Child Trafficking',
     'childmarriage': 'Child Marriage',
+    'economicexploitation': 'Economic exploitation',
+    'emotionalabuse': 'Emotional abuse',
+    'trainedfacilitators': 'Trained',
+    'nontrainedfacilitators': 'Not Trained',
     # demorgraphics
     'boys_total': 'Boys',
     'girls_total': 'Girls',

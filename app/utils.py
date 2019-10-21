@@ -36,7 +36,7 @@ def get_indicators_from_rapidpro_results(results_json, indicator_conf={}, report
             elif k.startswith('women_'):
                 women_total += int(results_json[k]['value'])
 
-    if report_type in ('pvsu', 'diversion'):
+    if report_type in ('pvsu', 'diversion', 'cvsu'):
         flow_inidicators['total_cases'] = total_cases
 
         flow_inidicators['boys_total'] = boys_total

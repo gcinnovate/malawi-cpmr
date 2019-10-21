@@ -9,7 +9,8 @@ from flask_migrate import Migrate, upgrade
 from app import create_app, db, redis_client
 from app.models import (
     Location, LocationTree, PoliceStation, User, Role,
-    FlowData, JusticeCourt, SummaryCases)
+    FlowData, JusticeCourt, SummaryCases, TraditionalAuthority,
+    CommunityVictimSupportUnit, ChildrensCorner)
 import datetime
 from flask import current_app
 from sqlalchemy.sql import text
@@ -137,9 +138,16 @@ def initdb():
 @click.option('--init', '-i', default=0)
 @click.option('--limit', '-x', default="yes")  # whether to limit on years to create data for
 def load_test_data(report, start_year, end_year, start_month, end_month, init, limit):
+    # for pvsu, diversion, cvsu and cc test data
     from config import INDICATOR_CATEGORY_MAPPING, INDICATOR_THRESHOLD
     # print(report)
-    police_stations = PoliceStation.query.all()
+    if report in ('pvsu', 'diversion'):
+        stations = PoliceStation.query.all()
+    elif report == 'cvsu':
+        stations = CommunityVictimSupportUnit.query.all()
+    elif report == 'cc':
+        stations = ChildrensCorner.query.all()
+
     year = datetime.datetime.now().year
     if start_year == end_year:
         end_year += 1
@@ -151,7 +159,7 @@ def load_test_data(report, start_year, end_year, start_month, end_month, init, l
                 else:
                     pass
             click.echo("{0}-{1:02}".format(y, m))
-            for p in police_stations:
+            for p in stations:
                 district_id = p.district_id
                 region_id = Location.query.filter_by(id=district_id).first().parent_id
                 month_str = "{0}-{1:02}".format(y, m)
@@ -181,19 +189,39 @@ def load_test_data(report, start_year, end_year, start_month, end_month, init, l
                             women_total += val
                     values[k] = indcators_total
                     total_cases += indcators_total
-                values['total_cases'] = total_cases
-                if report == 'pvsu':
+                # values['total_cases'] = total_cases
+                if report in ('pvsu', 'cvsu'):
+                    values['total_cases'] = total_cases
                     values['boys_total'] = boys_total
                     values['girls_total'] = girls_total
                     values['men_total'] = men_total
                     values['women_total'] = women_total
-                flow_data_obj = FlowData.query.filter_by(
-                    year=y, month=month_str, region=region_id, district=district_id,
-                    station=p.id, report_type=report).first()
-                if not flow_data_obj:
-                    db.session.add(FlowData(
-                        region=region_id, district=district_id, station=p.id, month=month_str,
-                        year=y, report_type=report, values=values))
+
+                if report in ('pvsu', 'diversion'):  # reporting at police station level
+                    flow_data_obj = FlowData.query.filter_by(
+                        year=y, month=month_str, region=region_id, district=district_id,
+                        station=p.id, report_type=report).first()
+                    if not flow_data_obj:
+                        db.session.add(FlowData(
+                            region=region_id, district=district_id, station=p.id, month=month_str,
+                            year=y, report_type=report, values=values))
+                elif report == 'cvsu':
+                    flow_data_obj = FlowData.query.filter_by(
+                        year=y, month=month_str, region=region_id, district=district_id,
+                        cvsu=p.id, report_type=report).first()
+                    if not flow_data_obj:
+                        db.session.add(FlowData(
+                            region=region_id, district=district_id, cvsu=p.id, month=month_str,
+                            year=y, report_type=report, values=values))
+                elif report == 'cc':
+                    flow_data_obj = FlowData.query.filter_by(
+                        year=y, month=month_str, region=region_id, district=district_id,
+                        children_corner=p.id, report_type=report).first()
+                    if not flow_data_obj:
+                        db.session.add(FlowData(
+                            region=region_id, district=district_id, children_corner=p.id,
+                            month=month_str, year=y, report_type=report, values=values))
+
                 click.echo(values)
             db.session.commit()
 
@@ -495,3 +523,103 @@ def load_legacy_data(filename, report):
                 flow_data_obj.values = new_values_obj
                 print("XXXXXXXXX=>", flow_data_obj.id, flow_data_obj.year)
                 db.session.commit()
+
+
+@app.cli.command("load_legacy_data2")
+@click.option('--filename', '-f')
+@click.option('--report', '-r', default='cvsu')
+def load_legacy_data2(filename, report):
+    click.echo("going to proccess the file: {0} for upload".format(filename))
+
+    def get_reporting_month(date_time_obj, month):
+        rpt_month = date_time_obj.month
+        if month > rpt_month:
+            year = date_time_obj.year - 1
+        else:
+            year = date_time_obj.year
+        return "{0}-{1}".format(year, month)
+
+    locs = Location.query.filter_by(level=3).all()
+    districts = {}
+    for l in locs:
+        districts[l.id] = {'name': l.name, 'parent_id': l.parent_id}
+    click.echo(districts)
+    click.echo("======>")
+
+    tas = TraditionalAuthority.query.all()
+    traditional_auths = {}
+    for t in tas:
+        pass
+
+    click.echo(traditional_auths)
+    click.echo("======>")
+
+
+@app.cli.command("create-cvsus")
+@click.option('--filename', '-f')
+def create_cvsu(filename):
+    locs = Location.query.filter_by(level=3).all()
+    districts = {}
+    for l in locs:
+        districts[l.name] = {'id': l.id, 'parent_id': l.parent_id}
+
+    tas = TraditionalAuthority.query.all()
+    district_tas = {}
+    for t in tas:
+        if t.district_id not in district_tas:
+            district_tas[t.district_id] = {}
+            district_tas[t.district_id][t.name] = t.id
+        else:
+            district_tas[t.district_id][t.name] = t.id
+
+    print(district_tas)
+    with open('../ccs2.txt') as f:
+        for l in f.readlines():
+            district, ta = l.strip().split(',')
+            district_id = districts[district]['id']
+            if ta not in district_tas[district_id]:
+                # add ta
+                ta_obj = TraditionalAuthority(name=ta, district_id=district_id)
+                db.session.add(ta_obj)
+        db.session.commit()
+
+    with open('../uniq_cvsus.txt') as f:
+        # print(f.read())
+        click.echo("Gonna create CVSUs")
+        for l in f.readlines():
+            try:
+                district, ta, cvsu = l.strip().split(',')
+                district_id = districts[district]['id']
+                ta_id = district_tas[district_id][ta]
+                print(district_id, "=>", ta_id)
+                if district_id and ta_id:
+                    cvsu_obj = CommunityVictimSupportUnit.query.filter_by(
+                        district_id=district_id, ta_id=ta_id, name=cvsu).first()
+                    if not cvsu_obj:
+                        cvsu_obj = CommunityVictimSupportUnit(
+                            district_id=district_id, ta_id=ta_id, name=cvsu)
+                        db.session.add(cvsu_obj)
+            except:
+                pass
+            db.session.commit()
+
+    with open('../uniq_ccs.txt') as f:
+        # print(f.read())
+        click.echo("Gonna create Children's Corners")
+        for l in f.readlines():
+            try:
+                district, ta, cc = l.strip().split(',')
+                district_id = districts[district]['id']
+                ta_id = district_tas[district_id][ta]
+                print(district_id, "=>", ta_id)
+                if district_id and ta_id:
+                    cc_obj = ChildrensCorner.query.filter_by(
+                        district_id=district_id, ta_id=ta_id, name=cc).first()
+                    if not cc_obj:
+                        cc_obj = ChildrensCorner(
+                            district_id=district_id, ta_id=ta_id, name=cc)
+                        db.session.add(cc_obj)
+            except:
+                pass
+            db.session.commit()
+        click.echo("Done creating CVSUs & CCS")

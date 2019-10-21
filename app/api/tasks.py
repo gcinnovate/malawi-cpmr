@@ -1,5 +1,6 @@
 from .. import db, celery, INDICATORS
-from ..models import FlowData, PoliceStation, JusticeCourt, Location
+from ..models import (
+    FlowData, TraditionalAuthority, ChildrensCorner, CommunityVictimSupportUnit)
 from ..utils import get_indicators_from_rapidpro_results
 from datetime import datetime
 import calendar
@@ -11,10 +12,10 @@ MONTHS_DICT = dict((v, k) for k, v in enumerate(calendar.month_name))
 
 
 @celery.task(name="tasks.save_flowdata")
-def save_flowdata(request_args, request_json, districts, pstations, jcourts):
+def save_flowdata(
+        request_args, request_json, districts, pstations=None, jcourts=None, cvsus=None):
     msisdn = request_args.get('msisdn')
     report_type = request_args.get('report_type')
-    station = request_args.get('station').title()
     district = request_args.get('district').title()
 
     flowdata = get_indicators_from_rapidpro_results(
@@ -32,11 +33,11 @@ def save_flowdata(request_args, request_json, districts, pstations, jcourts):
     # redis_client.districts set using @app.before_first_request
     ids = districts.get(district)
     if ids:
-        logger.info(f'Going to save data for district: {district}, station: {station}')
         district_id = ids['id']
         region_id = ids['parent_id']
         if report_type in ('pvsu', 'diversion'):
-            logger.info(f'Handling PVSU or Diversion Data for MSISDN: {msisdn}')
+            logger.info('Handling PVSU or Diversion Data for MSISDN: {0}'.format(msisdn))
+            station = request_args.get('station').title()
             police_station = pstations.get(station)
             value_record = FlowData.query.filter_by(
                 year=year, month=month_str, station=police_station, report_type=report_type).first()
@@ -52,7 +53,7 @@ def save_flowdata(request_args, request_json, districts, pstations, jcourts):
             db.session.commit()
 
         elif report_type == 'ncjf':
-            logger.info(f'Handling NCJF Data for MSISDN: {msisdn}')
+            logger.info('Handling NCJF Data for MSISDN: {0}'.format(msisdn))
             court = jcourts.get(station)
             value_record = FlowData.query.filter_by(
                 year=year, month=month_str, court=court, report_type=report_type).first()
@@ -66,6 +67,74 @@ def save_flowdata(request_args, request_json, districts, pstations, jcourts):
                     msisdn=msisdn, district=district_id, region=region_id, court=court,
                     report_type=report_type, month=month_str, year=year, values=flowdata))
             db.session.commit()
-        logger.info(f'Done processing flow values')
+
+        elif report_type == 'cvsu':
+            ta = request_args.get('traditional_authority', '')
+            cvsu = request_args.get('cvsu', '')
+            logger.info('Handling CVSU Data for MSISDN: {0} TA:{1}, CVSU:{2}'.format(msisdn, ta, cvsu))
+            ta_obj = TraditionalAuthority.query.filter_by(
+                district_id=district_id).filter(TraditionalAuthority.name.ilike(ta)).first()
+            if ta_obj:
+                cvsu_obj = CommunityVictimSupportUnit.query.filter_by(
+                    name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id).first()
+                if not cvsu_obj:
+                    cvsu_obj = CommunityVictimSupportUnit(
+                        name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id)
+            else:
+                if 'Cvsu' in ta.title():
+                    ta = ta.title().replace('Cvsu', 'CVSU')
+                db.sessin.add(TraditionalAuthority(district_id=district_id, name=ta))
+                ta_obj = TraditionalAuthority.query.filter_by(district_id=district_id, name=ta).first()
+                cvsu_obj = CommunityVictimSupportUnit(name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id)
+                db.session.add(cvsu_obj)
+
+            value_record = FlowData.query.filter_by(
+                year=year, month=month_str, cvsu=cvsu_obj.id, report_type=report_type).first()
+
+            if value_record:
+                value_record.values = flowdata
+                value_record.msisdn = msisdn
+                value_record.updated = datetime.now()
+            else:
+                db.session.add(FlowData(
+                    msisdn=msisdn, district=district_id, region=region_id, cvsu=cvsu_obj.id,
+                    report_type=report_type, month=month_str, year=year, values=flowdata))
+            db.session.commit()
+
+        elif report_type == 'cc':
+            logger.info('Handling CC Data for MSISDN: {0}'.format(msisdn))
+            ta = request_args.get('traditional_authority', '')
+            childrens_corner = request_args.get('childrens_corner', '')
+            ta_obj = TraditionalAuthority.query.filter_by(
+                district_id=district_id).filter(TraditionalAuthority.name.ilike(ta)).first()
+            if ta_obj:
+                cc_obj = ChildrensCorner.query.filter_by(
+                    name=childrens_corner.title(), district_id=district_id, ta_id=ta_obj.id).first()
+                if not cc_obj:
+                    cc_obj = ChildrensCorner(
+                        name=childrens_corner.title(), district_id=district_id, ta_id=ta_obj.id)
+            else:
+                if 'Cvsu' in ta.title():
+                    ta = ta.title().replace('Cvsu', 'CVSU')
+                db.sessin.add(TraditionalAuthority(district_id=district_id, name=ta))
+                ta_obj = TraditionalAuthority.query.filter_by(district_id=district_id, name=ta).first()
+                cc_obj = ChildrensCorner(name=childrens_corner, district_id=district_id, ta_id=ta_obj.id)
+                db.session.add(cc_obj)
+
+            value_record = FlowData.query.filter_by(
+                year=year, month=month_str, children_corner=cc_obj.id,
+                report_type=report_type).first()
+
+            if value_record:
+                value_record.values = flowdata
+                value_record.msisdn = msisdn
+                value_record.updated = datetime.now()
+            else:
+                db.session.add(FlowData(
+                    msisdn=msisdn, district=district_id, region=region_id, children_corner=cc_obj.id,
+                    report_type=report_type, month=month_str, year=year, values=flowdata))
+
+            db.session.commit()
+        logger.info('Done processing flow values')
     else:
         logger.info("district ids empty")

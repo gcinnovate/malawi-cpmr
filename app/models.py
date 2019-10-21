@@ -34,6 +34,7 @@ class Location(db.Model, BaseNestedSets):
     tree_id = db.Column(db.Integer, db.ForeignKey('locationtree.id'))
     code = db.Column(db.String(64), index=True, unique=True)
     name = db.Column(db.String(64), index=True)
+    iso_id = db.Column(db.String(8), index=True)
 
 
 class PoliceStation(db.Model):
@@ -54,6 +55,29 @@ class JusticeCourt(db.Model):
     latitude = db.Column(db.String())
 
 
+class TraditionalAuthority(db.Model):
+    __tablename__ = 'traditional_authorities'
+    id = db.Column(db.Integer, primary_key=True)
+    district_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
+    name = db.Column(db.String(64), index=True)
+
+
+class CommunityVictimSupportUnit(db.Model):
+    __tablename__ = 'community_victim_support_units'
+    id = db.Column(db.Integer, primary_key=True)
+    ta_id = db.Column(db.Integer, db.ForeignKey('traditional_authorities.id'))
+    district_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
+    name = db.Column(db.String(64), index=True)
+
+
+class ChildrensCorner(db.Model):
+    __tablename__ = 'childrens_corners'
+    id = db.Column(db.Integer, primary_key=True)
+    ta_id = db.Column(db.Integer, db.ForeignKey('traditional_authorities.id'))
+    district_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
+    name = db.Column(db.String(64), index=True)
+
+
 class FlowData(db.Model, TimeStampMixin):
     """To hold flow data from RapidPro"""
     __tablename__ = 'flow_data'
@@ -62,6 +86,8 @@ class FlowData(db.Model, TimeStampMixin):
     district = db.Column(db.Integer, db.ForeignKey('locations.id'))
     station = db.Column(db.Integer, db.ForeignKey('police_stations.id'))
     court = db.Column(db.Integer, db.ForeignKey('justice_courts.id'))
+    cvsu = db.Column(db.Integer, db.ForeignKey('community_victim_support_units.id'))
+    children_corner = db.Column(db.Integer, db.ForeignKey('childrens_corners.id'))
     report_type = db.Column(db.String(), index=True)
     msisdn = db.Column(db.String(), index=True)
     month = db.Column(db.String(), index=True)
