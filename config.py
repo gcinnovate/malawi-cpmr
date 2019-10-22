@@ -250,7 +250,9 @@ INDICATOR_THRESHOLD = {
     'childmarriage': 30,
     'referred': 54,
     'violence': 70,
-    'attendance': 150
+    'attendance': 150,
+    'trainedfacilitators': 25,
+    'nontrainedfacilitators': 10
 }
 # a mapping of flow variables to their readable description
 INDICATOR_NAME_MAPPING = {
