@@ -1,4 +1,7 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
+DROP VIEW IF EXISTS cvsu_cases_demographics_regional_view;
+DROP VIEW IF EXISTS cvsu_casetypes_regional_view;
+DROP VIEW IF EXISTS flow_data_cvsu_view;
 DROP VIEW IF EXISTS ncjf_childvictim_cases_stats_view;
 DROP VIEW IF EXISTS ncjf_chilcases_concluded_by_courts;
 DROP VIEW IF EXISTS ncjf_childcases_view;
@@ -494,3 +497,127 @@ CREATE VIEW ncjf_childvictim_cases_stats_view AS
         flow_data_ncjf_view
     GROUP BY month, rdate
     ORDER BY month DESC;
+
+DROP VIEW IF EXISTS flow_data_cvsu_view;
+-- view for all cvsu data
+CREATE OR REPLACE VIEW flow_data_cvsu_view  AS
+    SELECT
+        a.month, a.year, a.report_type, a.msisdn,
+        c.name AS region,
+        b.name AS district,
+        c.id AS region_id,
+        d.name AS cvsu,
+        (a.values->>'physicalviolence')::int physicalviolence,
+        (a.values->>'defilement')::int defilement,
+        (a.values->>'sexualviolence')::int sexualviolence,
+        (a.values->>'childneglect')::int childneglect,
+        (a.values->>'childmarriage')::int childmarriage,
+        (a.values->>'emotionalabuse')::int emotionalabuse,
+        (a.values->>'economicexploitation')::int economicexploitation,
+        (a.values->>'humantrafficking')::int humantrafficking,
+        (a.values->>'economicabuse')::int economicabuse,
+        (a.values->>'maritalconflict')::int maritalconflict,
+        (a.values->>'boys_total')::int boys_total,
+        (a.values->>'girls_total')::int girls_total,
+        (a.values->>'men_total')::int men_total,
+        (a.values->>'women_total')::int women_total,
+        (a.values->>'total_cases')::int total_cases,
+        created,
+        CASE
+            WHEN a.month ~ '(0[13578]|1[02])$' THEN
+                (a.month || '-31')::date
+            WHEN a.month ~ '(0[469]|1[1])$' THEN
+                (a.month || '-30')::date
+            ELSE
+                (a.month || '-28')::date
+        END AS rdate,
+        'Malawi'::text AS nation
+    FROM
+        flow_data a
+        LEFT OUTER JOIN locations AS b ON a.district = b.id
+        LEFT OUTER JOIN locations AS c ON a.region = c.id
+        LEFT OUTER JOIN community_victim_support_units AS d ON a.cvsu = d.id
+    WHERE
+        a.report_type = 'cvsu';
+
+-- cvsu_pie_chart
+-- this is for the regional case types
+DROP VIEW IF EXISTS cvsu_casetypes_regional_view;
+CREATE VIEW cvsu_casetypes_regional_view AS
+    SELECT
+        sum(physicalviolence) physicalviolence,
+        sum(defilement) defilement,
+        sum(sexualviolence) sexualviolence,
+        sum(childneglect) childneglect,
+        sum(childmarriage) childmarriage,
+        sum(emotionalabuse) emotionalabuse,
+        sum(economicexploitation) economicexploitation,
+        sum(humantrafficking) humantrafficking,
+        sum(economicabuse) economicabuse,
+        sum(maritalconflict) maritalconflict,
+        month, year, region_id
+    FROM flow_data_cvsu_view
+    GROUP BY month, year, region_id;
+
+-- view for cvsu demographics data at regional level
+DROP VIEW IF EXISTS cvsu_cases_demographics_regional_view;
+CREATE VIEW cvsu_cases_demographics_regional_view AS
+    SELECT
+        sum(boys_total) boys_total,
+        sum(girls_total) girls_total,
+        sum(men_total) men_total,
+        sum(women_total) women_total,
+        month, year, region_id
+    FROM flow_data_cvsu_view
+    GROUP BY month, year, region_id;
+
+DROP VIEW IF EXISTS flow_data_cc_view;
+CREATE VIEW flow_data_cc_view AS
+    SELECT
+        a.month, a.year, a.report_type, a.msisdn,
+        c.name AS region,
+        b.name AS district,
+        c.id AS region_id,
+        d.name AS childrens_corner,
+        (a.values->>'boys_attendance')::int boys_attendance,
+        (a.values->>'girls_attendance')::int girls_attendance,
+        (a.values->>'attendance')::int attendance,
+        (a.values->>'boys_referred')::int boys_referred,
+        (a.values->>'girls_referred')::int girls_referred,
+        (a.values->>'referred')::int referred,
+        (a.values->>'boys_violence')::int boys_violence,
+        (a.values->>'girls_violence')::int girls_violence,
+        (a.values->>'violence')::int violence,
+        (a.values->>'men_trainedfacilitators')::int men_trainedfacilitators,
+        (a.values->>'women_trainedfacilitators')::int women_trainedfacilitators,
+        (a.values->>'trainedfacilitators')::int trainedfacilitators,
+        (a.values->>'men_nontrainedfacilitators')::int men_nontrainedfacilitators,
+        (a.values->>'women_nontrainedfacilitators')::int women_nontrainedfacilitators,
+        (a.values->>'nontrainedfacilitators')::int nontrainedfacilitators,
+        created,
+        CASE
+            WHEN a.month ~ '(0[13578]|1[02])$' THEN
+                (a.month || '-31')::date
+            WHEN a.month ~ '(0[469]|1[1])$' THEN
+                (a.month || '-30')::date
+            ELSE
+                (a.month || '-28')::date
+        END AS rdate,
+        'Malawi'::text AS nation
+    FROM
+        flow_data a
+        LEFT OUTER JOIN locations AS b ON a.district = b.id
+        LEFT OUTER JOIN locations AS c ON a.region = c.id
+        LEFT OUTER JOIN childrens_corners AS d ON a.children_corner = d.id
+    WHERE
+        a.report_type = 'cc';
+
+-- view for childrens corners attendance at regional level
+DROP VIEW IF EXISTS cc_attendance_regional_view;
+CREATE VIEW cc_attendance_regional_view AS
+    SELECT
+        sum(trainedfacilitators) trainedfacilitators,
+        sum(nontrainedfacilitators) nontrainedfacilitators,
+        month, year, region_id
+    FROM flow_data_cc_view
+    GROUP BY month, year, region_id;

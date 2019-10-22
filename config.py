@@ -111,7 +111,7 @@ INDICATORS = {
     ],
     'cc': [
         'month', 'attendance', 'violence', 'referred',
-        'boys_attendace', 'girls_attendance',
+        'boys_attendance', 'girls_attendance',
         'boys_violence', 'girls_violence',
         'boys_referred', 'girls_referred',
         'men_trainedfacilitators', 'women_trainedfacilitators',

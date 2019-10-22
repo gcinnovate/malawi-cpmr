@@ -442,6 +442,85 @@ def refresh_pvsu_casetypes():
             db.session.add(s)
         db.session.commit()
 
+    results = db.engine.execute("SELECT * FROM cvsu_casetypes_regional_view order by year desc")
+    # print(results.keys())
+    records = []
+    for row in results:
+        month = row['month']
+        year = row['year']
+        region_id = row['region_id']
+        for k in results.keys():
+            if k in ('month', 'year', 'region_id'):
+                continue
+            casetype, cases = (k, row[k])
+            records.append((casetype, cases, month, year, region_id))
+
+    print(records)
+    for r in records:
+        summary = SummaryCases.query.filter_by(
+            casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3],
+            region=r[4], report_type='cvsu', summary_for='region', summary_slug='types').first()
+        if summary:
+            summary.value = r[1]
+        else:
+            s = SummaryCases(
+                casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
+                region=r[4], report_type='cvsu', summary_for='region', summary_slug='types')
+            db.session.add(s)
+        db.session.commit()
+
+    # Load data for cvsu regional demography
+    results = db.engine.execute("SELECT * FROM cvsu_cases_demographics_regional_view order by year desc")
+    records = []
+    for row in results:
+        month = row['month']
+        year = row['year']
+        region_id = row['region_id']
+        for k in results.keys():
+            if k in ('month', 'year', 'region_id'):
+                continue
+            casetype, cases = (k, row[k])
+            records.append((casetype, cases, month, year, region_id))
+
+    print(records)
+    for r in records:
+        summary = SummaryCases.query.filter_by(
+            casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3], region=r[4],
+            report_type='cvsu', summary_for='region', summary_slug='demography').first()
+        if summary:
+            summary.value = r[1]
+        else:
+            s = SummaryCases(
+                casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
+                region=r[4], report_type='cvsu', summary_for='region', summary_slug='demography')
+            db.session.add(s)
+        db.session.commit()
+
+    results = db.engine.execute("SELECT * FROM cc_attendance_regional_view order by year desc")
+    records = []
+    for row in results:
+        month = row['month']
+        year = row['year']
+        region_id = row['region_id']
+        for k in results.keys():
+            if k in ('month', 'year', 'region_id'):
+                continue
+            casetype, cases = (k, row[k])
+            records.append((casetype, cases, month, year, region_id))
+
+    for r in records:
+        summary = SummaryCases.query.filter_by(
+            casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3], region=r[4],
+            report_type='cc', summary_for='region', summary_slug='attendance').first()
+        if summary:
+            summary.value = r[1]
+        else:
+            s = SummaryCases(
+                casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
+                region=r[4], report_type='cc', summary_for='region', summary_slug='attendance')
+            db.session.add(s)
+        db.session.commit()
+
 
 @app.cli.command("load_legacy_data")
 @click.option('--filename', '-f')
