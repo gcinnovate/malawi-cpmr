@@ -1,4 +1,5 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
+DROP VIEW IF EXISTS cc_attendance_regional_view;
 DROP VIEW IF EXISTS cvsu_cases_demographics_regional_view;
 DROP VIEW IF EXISTS cvsu_casetypes_regional_view;
 DROP VIEW IF EXISTS flow_data_cvsu_view;
@@ -579,6 +580,7 @@ CREATE VIEW flow_data_cc_view AS
         b.name AS district,
         c.id AS region_id,
         d.name AS childrens_corner,
+        b.longitude::numeric, b.latitude::numeric,
         (a.values->>'boys_attendance')::int boys_attendance,
         (a.values->>'girls_attendance')::int girls_attendance,
         (a.values->>'attendance')::int attendance,

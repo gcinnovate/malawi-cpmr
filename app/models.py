@@ -35,6 +35,8 @@ class Location(db.Model, BaseNestedSets):
     code = db.Column(db.String(64), index=True, unique=True)
     name = db.Column(db.String(64), index=True)
     iso_id = db.Column(db.String(8), index=True)
+    longitude = db.Column(db.String())
+    latitude = db.Column(db.String())
 
 
 class PoliceStation(db.Model):
