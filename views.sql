@@ -1,4 +1,24 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
+DROP VIEW IF EXISTS cases_dealtwith_regional_view_eastern;
+DROP VIEW IF EXISTS cases_dealtwith_regional_view_southern;
+DROP VIEW IF EXISTS cases_dealtwith_regional_view_northern;
+DROP VIEW IF EXISTS cases_dealtwith_regional_view_central;
+--
+DROP VIEW IF EXISTS flow_data_diversion_view_eastern;
+DROP VIEW IF EXISTS flow_data_diversion_view_southern;
+DROP VIEW IF EXISTS flow_data_diversion_view_northern;
+DROP VIEW IF EXISTS flow_data_diversion_view_central;
+--
+DROP VIEW IF EXISTS summary_cases_view_eastern;
+DROP VIEW IF EXISTS summary_cases_view_southern;
+DROP VIEW IF EXISTS summary_cases_view_northern;
+DROP VIEW IF EXISTS summary_cases_view_central;
+--
+DROP VIEW IF EXISTS flow_data_pvsu_view_eastern;
+DROP VIEW IF EXISTS flow_data_pvsu_view_southern;
+DROP VIEW IF EXISTS flow_data_pvsu_view_northern;
+DROP VIEW IF EXISTS flow_data_pvsu_view_central;
+--
 DROP VIEW IF EXISTS cc_attendance_regional_view;
 DROP VIEW IF EXISTS cvsu_cases_demographics_regional_view;
 DROP VIEW IF EXISTS cvsu_casetypes_regional_view;
@@ -623,3 +643,73 @@ CREATE VIEW cc_attendance_regional_view AS
         month, year, region_id
     FROM flow_data_cc_view
     GROUP BY month, year, region_id;
+
+
+-- Create region level views to help with permissions
+DROP VIEW IF EXISTS flow_data_pvsu_view_eastern;
+CREATE VIEW flow_data_pvsu_view_eastern AS
+    SELECT * FROM flow_data_pvsu_view WHERE region = 'Eastern';
+
+DROP VIEW IF EXISTS flow_data_pvsu_view_southern;
+CREATE VIEW flow_data_pvsu_view_southern AS
+    SELECT * FROM flow_data_pvsu_view WHERE region = 'Southern';
+
+DROP VIEW IF EXISTS flow_data_pvsu_view_northern;
+CREATE VIEW flow_data_pvsu_view_northern AS
+    SELECT * FROM flow_data_pvsu_view WHERE region = 'Northern';
+
+DROP VIEW IF EXISTS flow_data_pvsu_view_central;
+CREATE VIEW flow_data_pvsu_view_central AS
+    SELECT * FROM flow_data_pvsu_view WHERE region = 'Central';
+
+-- summary_cases_views
+DROP VIEW IF EXISTS summary_cases_view_eastern;
+CREATE VIEW summary_cases_view_eastern AS
+    SELECT * FROM summary_cases_view WHERE region = 'Eastern';
+
+DROP VIEW IF EXISTS summary_cases_view_southern;
+CREATE VIEW summary_cases_view_southern AS
+    SELECT * FROM summary_cases_view WHERE region = 'Southern';
+
+DROP VIEW IF EXISTS summary_cases_view_northern;
+CREATE VIEW summary_cases_view_northern AS
+    SELECT * FROM summary_cases_view WHERE region = 'Northern';
+
+DROP VIEW IF EXISTS summary_cases_view_central;
+CREATE VIEW summary_cases_view_central AS
+    SELECT * FROM summary_cases_view WHERE region = 'Central';
+
+-- Diversion regional views
+DROP VIEW IF EXISTS flow_data_diversion_view_eastern;
+CREATE VIEW flow_data_diversion_view_eastern AS
+    SELECT * FROM flow_data_diversion_view WHERE region = 'Eastern';
+
+DROP VIEW IF EXISTS flow_data_diversion_view_southern;
+CREATE VIEW flow_data_diversion_view_southern AS
+    SELECT * FROM flow_data_diversion_view WHERE region = 'Southern';
+
+DROP VIEW IF EXISTS flow_data_diversion_view_northern;
+CREATE VIEW flow_data_diversion_view_northern AS
+    SELECT * FROM flow_data_diversion_view WHERE region = 'Northern';
+
+DROP VIEW IF EXISTS flow_data_diversion_view_central;
+CREATE VIEW flow_data_diversion_view_central AS
+    SELECT * FROM flow_data_diversion_view WHERE region = 'Central';
+
+-- Cases Delt with
+DROP VIEW IF EXISTS cases_dealtwith_regional_view_eastern;
+CREATE VIEW cases_dealtwith_regional_view_eastern AS
+    SELECT * from cases_dealtwith_regional_view WHERE region = 'Eastern';
+
+DROP VIEW IF EXISTS cases_dealtwith_regional_view_southern;
+CREATE VIEW cases_dealtwith_regional_view_southern AS
+    SELECT * from cases_dealtwith_regional_view WHERE region = 'Southern';
+
+DROP VIEW IF EXISTS cases_dealtwith_regional_view_northern;
+CREATE VIEW cases_dealtwith_regional_view_northern AS
+    SELECT * from cases_dealtwith_regional_view WHERE region = 'Northern';
+
+DROP VIEW IF EXISTS cases_dealtwith_regional_view_central;
+CREATE VIEW cases_dealtwith_regional_view_central AS
+    SELECT * from cases_dealtwith_regional_view WHERE region = 'Central';
+
