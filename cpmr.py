@@ -610,28 +610,127 @@ def load_legacy_data(filename, report):
 def load_legacy_data2(filename, report):
     click.echo("going to proccess the file: {0} for upload".format(filename))
 
-    def get_reporting_month(date_time_obj, month):
+    def get_reporting_month(date_time_obj, month, yr=''):
         rpt_month = date_time_obj.month
-        if month > rpt_month:
-            year = date_time_obj.year - 1
+        if int(month) > rpt_month:
+            if yr:
+                year = yr
+            else:
+                year = date_time_obj.year - 1
         else:
             year = date_time_obj.year
-        return "{0}-{1}".format(year, month)
+        return "{0}-{1:02}".format(year, int(month))
 
     locs = Location.query.filter_by(level=3).all()
     districts = {}
+    district_tas = {}
     for l in locs:
-        districts[l.id] = {'name': l.name, 'parent_id': l.parent_id}
+        districts[l.name] = {'id': l.id, 'parent_id': l.parent_id}
+        district_tas[l.id] = {}
     click.echo(districts)
     click.echo("======>")
 
     tas = TraditionalAuthority.query.all()
-    traditional_auths = {}
+    # traditional_auths = {}
     for t in tas:
-        pass
+        district_tas[t.district_id][t.name] = t.id
 
-    click.echo(traditional_auths)
+    # click.echo(district_tas)
+    # return  # XXX
     click.echo("======>")
+    wb = load_workbook(filename, read_only=True)
+    for sheet in wb:
+        # print sheet.title
+        data = []
+        headings = []
+        j = 0
+        for row in sheet.rows:
+            if j > 0:
+                # val = ['%s' % i.value for i in row]
+                val = [u'' if i.value is None else str(i.value) for i in row]
+                # print val
+                data.append(val)
+            else:
+                headings = [u'' if i.value is None else str(i.value) for i in row]
+            j += 1
+
+        click.echo(headings)
+        click.echo(data[:10])
+
+        for d in data:
+            values = {}
+            for idx, v in enumerate(d):
+                if idx == 0:
+                    pass
+
+                if idx == 1:
+                    reporting_month = d[1].split(' ')[0]
+                    date_time_obj = datetime.datetime.strptime(reporting_month, '%Y-%m-%d')
+
+                    month = get_reporting_month(date_time_obj, d[5], d[0])
+                    year = month.split('-')[0]
+                    print("====>", date_time_obj, month, year)
+
+                if idx == 2:
+                    district = d[2].strip()
+                    district_id = districts[district]['id']
+                    region_id = districts[district]['parent_id']
+                    print(" District: ", district, " Region: ", region_id)
+                if idx == 3:
+                    ta = d[3].strip()
+                    if ta in district_tas[district_id]:
+                        ta_id = district_tas[district_id][ta]
+                    else:
+                        click.echo("Missing TA:{0}".format(ta))
+                        pass
+                if idx == 4:
+                    if ta_id:
+                        if report == 'cc':
+                            cc_obj = ChildrensCorner.query.filter_by(
+                                name=d[4].strip().title(), district_id=district_id, ta_id=ta_id).first()
+                            if not cc_obj:
+                                cc_obj = ChildrensCorner(
+                                    name=d[4].strip().title(), district_id=district_id, ta_id=ta_id)
+                                db.session.add(cc_obj)
+                            cc_id = cc_obj.id
+
+                        elif report == 'cvsu':
+                            cvsu_obj = CommunityVictimSupportUnit.query.filter_by(
+                                name=d[4].strip().title(), district_id=district_id, ta_id=ta_id).first()
+                            if not cvsu_obj:
+                                cvsu_obj = CommunityVictimSupportUnit(
+                                    name=d[4].strip().title(), district_id=district_id, ta_id=ta_id)
+                                db.session.add(cvsu_obj)
+                            cvsu_id = cvsu_obj.id
+                if idx == 5:
+                    pass
+
+                if idx > 5:
+                    values[headings[idx]] = d[idx]
+
+            click.echo(values)
+            # print("++++++++++++> CVSU:", cvsu_id, " +++++++++> TA:", ta_id)
+
+            if report == 'cvsu':
+                flow_data_obj = FlowData.query.filter_by(
+                    year=year, month=month, report_type=report, region=region_id, district=district_id,
+                    cvsu=cvsu_id).first()
+            elif report == 'cc':
+                flow_data_obj = FlowData.query.filter_by(
+                    year=year, month=month, report_type=report, region=region_id, district=district_id,
+                    children_corner=cc_id).first()
+            if flow_data_obj:
+                # click.echo("+++++++++++++")
+                # click.echo(flow_data_obj.values)
+                # click.echo("--------------")
+                new_values_obj = flow_data_obj.values.copy()
+                for key, val in values.items():
+                    new_values_obj[key] = val
+
+                # click.echo(new_values_obj)
+                flow_data_obj.values = new_values_obj
+                print("XXXXXXXXX=>", flow_data_obj.id, flow_data_obj.year)
+                db.session.commit()
 
 
 @app.cli.command("create-cvsus")
