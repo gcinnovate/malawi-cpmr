@@ -1,4 +1,9 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
+DROP VIEW IF EXISTS pvsu_victims_data_eastern;
+DROP VIEW IF EXISTS pvsu_victims_data_southern;
+DROP VIEW IF EXISTS pvsu_victims_data_northern;
+DROP VIEW IF EXISTS pvsu_victims_data_central;
+--
 DROP VIEW IF EXISTS cases_dealtwith_regional_view_eastern;
 DROP VIEW IF EXISTS cases_dealtwith_regional_view_southern;
 DROP VIEW IF EXISTS cases_dealtwith_regional_view_northern;
@@ -35,6 +40,7 @@ DROP VIEW IF EXISTS pvsu_cases_by_region_view;
 DROP VIEW IF EXISTS pvsu_casetypes_regional_view;
 DROP VIEW IF EXISTS pvsu_cases_demographics_regional_view;
 DROP VIEW IF EXISTS flow_data_pvsu_view;
+DROP VIEW IF EXISTS flow_data_diversion_view;
 -- view for all pvsu data
 CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
     SELECT
@@ -713,3 +719,95 @@ DROP VIEW IF EXISTS cases_dealtwith_regional_view_central;
 CREATE VIEW cases_dealtwith_regional_view_central AS
     SELECT * from cases_dealtwith_regional_view WHERE region = 'Central';
 
+CREATE VIEW pvsu_victims_data AS
+    SELECT a.month,
+        a.year,
+        a.msisdn,
+        c.name AS region,
+        b.name AS district,
+        d.name AS police_station,
+        to_char(created, 'YYYY-MM-DD HH:MI:SS') created,
+        a.values->>'boys_suicide' boys_suicide,
+        a.values->>'girls_suicide' girls_suicide,
+        a.values->>'men_suicide' men_suicide,
+        a.values->>'women_suicide' women_suicide,
+        (a.values->>'suicide')::int suicide,
+        a.values->>'boys_physicalviolence' boys_physicalviolence,
+        a.values->>'girls_physicalviolence' girls_physicalviolence,
+        a.values->>'men_physicalviolence' men_physicalviolence,
+        a.values->>'women_physicalviolence' women_physicalviolence,
+        (a.values->>'physicalviolence')::int physicalviolence,
+        a.values->>'girls_rape' girls_rape,
+        a.values->>'women_rape' women_rape,
+        (a.values->>'rape')::int rape,
+        a.values->>'girls_defilement' girls_defilement,
+        (a.values->>'defilement')::int defilement,
+        a.values->>'boys_indecentassault' boys_indecentassault,
+        a.values->>'girls_indecentassault' girls_indecentassault,
+        a.values->>'men_indecentassault' men_indecentassault,
+        a.values->>'women_indecentassault' women_indecentassault,
+        (a.values->>'indecentassault')::int indecentassault,
+        a.values->>'boys_kidnapping' boys_kidnapping,
+        a.values->>'girls_kidnapping' girls_kidnapping,
+        a.values->>'men_kidnapping' men_kidnapping,
+        a.values->>'women_kidnapping' women_kidnapping,
+        (a.values->>'kidnapping')::int kidnapping,
+        a.values->>'boys_humantrafficking' boys_humantrafficking,
+        a.values->>'girls_humantrafficking' girls_humantrafficking,
+        a.values->>'men_humantrafficking' men_humantrafficking,
+        a.values->>'women_humantrafficking' women_humantrafficking,
+        (a.values->>'humantrafficking')::int humantrafficking,
+        a.values->>'boys_sexualoffences' boys_sexualoffences,
+        a.values->>'girls_sexualoffences' girls_sexualoffences,
+        a.values->>'men_sexualoffences' men_sexualoffences,
+        a.values->>'women_sexualoffences' women_sexualoffences,
+        (a.values->>'sexualoffences')::int sexualoffences,
+        a.values->>'boys_maritalconflict' boys_maritalconflict,
+        a.values->>'girls_maritalconflict' girls_maritalconflict,
+        a.values->>'men_maritalconflict' men_maritalconflict,
+        a.values->>'women_maritalconflict' women_maritalconflict,
+        (a.values->>'maritalconflict')::int maritalconflict,
+        a.values->>'boys_childneglect' boys_childneglect,
+        a.values->>'girls_childneglect' girls_childneglect,
+        (a.values->>'childneglect')::int childneglect,
+        a.values->>'boys_economicabuse' boys_economicabuse,
+        a.values->>'girls_economicabuse' girls_economicabuse,
+        a.values->>'men_economicabuse' men_economicabuse,
+        a.values->>'women_economicabuse' women_economicabuse,
+        (a.values->>'economicabuse')::int economicabuse,
+        a.values->>'boys_breachofpeace' boys_breachofpeace,
+        a.values->>'girls_breachofpeace' girls_breachofpeace,
+        a.values->>'men_breachofpeace' men_breachofpeace,
+        a.values->>'women_breachofpeace' women_breachofpeace,
+        (a.values->>'breachofpeace')::int breachofpeace,
+        (a.values->>'total_cases')::int total_cases,
+        (a.values->>'boys_total')::int boys_total,
+        (a.values->>'girls_total')::int girls_total,
+        (a.values->>'men_total')::int men_total,
+        (a.values->>'women_total')::int women_total
+    FROM flow_data a
+    LEFT OUTER JOIN locations AS b ON a.district = b.id
+    LEFT OUTER JOIN locations AS c ON a.region = c.id
+    LEFT OUTER JOIN police_stations AS d ON a.station = d.id
+    WHERE
+        a.report_type = 'pvsu'
+    ORDER BY
+        month, region, district, police_station;
+
+DROP VIEW IF EXISTS pvsu_victims_data_eastern;
+CREATE VIEW pvsu_victims_data_eastern AS
+    SELECT * FROM pvsu_victims_data WHERE region = 'Eastern';
+
+DROP VIEW IF EXISTS pvsu_victims_data_southern;
+CREATE VIEW pvsu_victims_data_southern AS
+    SELECT * FROM pvsu_victims_data WHERE region = 'Southern';
+
+DROP VIEW IF EXISTS pvsu_victims_data_northern;
+CREATE VIEW pvsu_victims_data_northern AS
+    SELECT * FROM pvsu_victims_data WHERE region = 'Northern';
+
+DROP VIEW IF EXISTS pvsu_victims_data_central;
+CREATE VIEW pvsu_victims_data_central AS
+    SELECT * FROM pvsu_victims_data WHERE region = 'Central';
+
+-- Diversion Data
