@@ -1,4 +1,9 @@
 --CREATE INDEX IF NOT EXISTS flow_data_idx1 ON flow_data USING GIN(values);
+DROP VIEW IF EXISTS diversion_data_view_eastern;
+DROP VIEW IF EXISTS diversion_data_view_southern;
+DROP VIEW IF EXISTS diversion_data_view_northern;
+DROP VIEW IF EXISTS diversion_data_view_central;
+--
 DROP VIEW IF EXISTS pvsu_victims_data_eastern;
 DROP VIEW IF EXISTS pvsu_victims_data_southern;
 DROP VIEW IF EXISTS pvsu_victims_data_northern;
@@ -719,6 +724,7 @@ DROP VIEW IF EXISTS cases_dealtwith_regional_view_central;
 CREATE VIEW cases_dealtwith_regional_view_central AS
     SELECT * from cases_dealtwith_regional_view WHERE region = 'Central';
 
+DROP VIEW IF EXISTS pvsu_victims_data;
 CREATE VIEW pvsu_victims_data AS
     SELECT a.month,
         a.year,
@@ -811,3 +817,20 @@ CREATE VIEW pvsu_victims_data_central AS
     SELECT * FROM pvsu_victims_data WHERE region = 'Central';
 
 -- Diversion Data
+DROP VIEW IF EXISTS diversion_data_view_eastern;
+CREATE VIEW diversion_data_view_eastern AS
+    SELECT * FROM diversion_data_view WHERE region = 'Eastern';
+
+DROP VIEW IF EXISTS diversion_data_view_southern;
+CREATE VIEW diversion_data_view_southern AS
+    SELECT * FROM diversion_data_view WHERE region = 'Southern';
+
+DROP VIEW IF EXISTS diversion_data_view_northern;
+CREATE VIEW diversion_data_view_northern AS
+    SELECT * FROM diversion_data_view WHERE region = 'Northern';
+
+DROP VIEW IF EXISTS diversion_data_view_central;
+CREATE VIEW diversion_data_view_central AS
+    SELECT * FROM diversion_data_view WHERE region = 'Central';
+
+
