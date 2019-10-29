@@ -284,4 +284,4 @@ INDICATOR_NAME_MAPPING = {
 }
 
 # Flow names that use a month generated from reporting date
-AUTO_MONTH_FLOWS = ['ncjf']
+AUTO_MONTH_FLOWS = []
