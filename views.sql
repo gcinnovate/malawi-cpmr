@@ -524,7 +524,7 @@ CREATE VIEW ncjf_childvictim_cases_stats_view AS
             ELSE
                 0
         END AS specialreferrals,
-        'Malawi':: text as nation,
+        'National':: text as nation,
         month, rdate
     FROM
         flow_data_ncjf_view
