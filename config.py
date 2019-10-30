@@ -264,7 +264,7 @@ INDICATOR_NAME_MAPPING = {
     'humantrafficking': 'Human trafficking',
     'kidnapping': 'Kidnapping',
     'sexualoffences': 'Other sexual violence',
-    'sexualviolence': 'Sexual violence',
+    'sexualviolence': 'Other Sexual violence',
     'maritalconflict': 'Marital and interpersonal conflict',
     'childneglect': 'Child neglect',
     'economicabuse': 'Economic abuse',
