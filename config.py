@@ -243,7 +243,7 @@ INDICATOR_THRESHOLD = {
     'diverted': 15,
     'perpetrators': 60,
     'concluded': 200,
-    'total_childcases': 180,
+    'total_childcases': random.randint(500, 1000),
     'sexualviolence': 40,
     'emotionalabuse': 70,
     'economicexploitation': 55,
