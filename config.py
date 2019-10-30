@@ -262,7 +262,7 @@ INDICATOR_NAME_MAPPING = {
     'rape': 'Rape',
     'indecentassault': 'Indecent assault',
     'humantrafficking': 'Human trafficking',
-    'kidnapping': 'Kidnapping',
+    'kidnapping': 'Abduction',
     'sexualoffences': 'Other sexual violence',
     'sexualviolence': 'Other Sexual violence',
     'maritalconflict': 'Marital and interpersonal conflict',
