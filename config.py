@@ -264,7 +264,7 @@ INDICATOR_NAME_MAPPING = {
     'humantrafficking': 'Human trafficking',
     'kidnapping': 'Abduction',
     'sexualoffences': 'Other sexual violence',
-    'sexualviolence': 'Other Sexual violence',
+    'sexualviolence': 'Other sexual violence',
     'maritalconflict': 'Marital and interpersonal conflict',
     'childneglect': 'Child neglect',
     'economicabuse': 'Economic abuse',
@@ -285,3 +285,5 @@ INDICATOR_NAME_MAPPING = {
 
 # Flow names that use a month generated from reporting date
 AUTO_MONTH_FLOWS = []
+
+from local_config import *
