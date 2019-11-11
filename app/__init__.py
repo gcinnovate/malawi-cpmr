@@ -9,7 +9,7 @@ from flask_redis import FlaskRedis
 
 mail = Mail()
 moment = Moment()
-db = SQLAlchemy()
+db = SQLAlchemy(engine_options={'connect_args': {'connect_timeout': 5}})
 redis_client = FlaskRedis()
 celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
 
