@@ -285,5 +285,7 @@ INDICATOR_NAME_MAPPING = {
 
 # Flow names that use a month generated from reporting date
 AUTO_MONTH_FLOWS = []
-
-from local_config import *
+try:
+    from local_config import *
+except ImportError:
+    pass
