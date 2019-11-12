@@ -60,6 +60,11 @@ def make_shell_context():
     return dict(app=app, db=db, User=User, Role=Role)
 
 
+@app.teardown_appcontext
+def teardown_db(exception=None):
+    db.session.remove()
+
+
 @app.cli.command("initdb")
 def initdb():
     def id_generator(size=12, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
