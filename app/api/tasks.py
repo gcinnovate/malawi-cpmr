@@ -54,7 +54,8 @@ def save_flowdata(
 
         elif report_type == 'ncjf':
             logger.info('Handling NCJF Data for MSISDN: {0}'.format(msisdn))
-            court = jcourts.get(station)
+            station = request_args.get('station').title()
+            court = jcourts.get(station, '')
             value_record = FlowData.query.filter_by(
                 year=year, month=month_str, court=court, report_type=report_type).first()
 
