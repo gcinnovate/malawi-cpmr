@@ -550,6 +550,11 @@ def load_legacy_data(filename, report):
     for s in stations:
         police_stations[s.name] = {'id': s.id, 'district_id': s.district_id}
 
+    courts = JusticeCourt.query.all()
+    justice_courts = {}
+    for c in courts:
+        justice_courts[c.name] = {'id': c.id, 'district_id': c.district_id}
+
     click.echo(police_stations)
     click.echo("======>")
 
@@ -574,27 +579,48 @@ def load_legacy_data(filename, report):
         for d in data:
             values = {}
             for idx, v in enumerate(d):
+                msisdn = ""
                 if idx == 0:
-                    reporting_month = d[0].split(' ')[0]
-                    date_time_obj = datetime.datetime.strptime(reporting_month, '%Y-%m-%d')
-                    month = get_last_month(date_time_obj)
-                    year = month.split('-')[0]
-                    print("====>", date_time_obj, month, year)
+                    if report in ('pvsu', 'diversion'):
+                        reporting_month = d[0].split(' ')[0]
+                        date_time_obj = datetime.datetime.strptime(reporting_month, '%Y-%m-%d')
+                        month = get_last_month(date_time_obj)
+                        year = month.split('-')[0]
+                        print("====>", date_time_obj, month, year)
+                    elif report in ('ncjf'):
+                        month = d[0].strip()
+                        year = month.split('-')[0]
 
                 if idx == 1:
-                    station = d[1].strip()
+                    station = d[1].strip().title()
                     if report in ('pvsu', 'diversion'):
                         police_station = police_stations[station]['id']
                         district = police_stations[station]['district_id']
                         region = districts[district]['parent_id']
                         print("Station====>", police_station, " District: ", district, " Region: ", region)
+                    if report in ('ncjf'):
+                        court = justice_courts[station]['id']
+                        district = police_stations[station]['district_id']
+                        region = districts[district]['parent_id']
 
                 if idx > 1:
-                    values[headings[idx]] = d[idx]
+                    if report in ('pvsu', 'diversion'):
+                        values[headings[idx]] = d[idx]
+                    elif report in ('ncjf'):
+                        if idx == 2:
+                            msisdn = d[idx]
+                        else:
+                            values[headings[idx]] = d[idx]
 
-            flow_data_obj = FlowData.query.filter_by(
-                year=year, month=month, report_type=report, region=region, district=district,
-                station=police_station).first()
+            if report in ('pvsu', 'diversion'):
+                flow_data_obj = FlowData.query.filter_by(
+                    year=year, month=month, report_type=report, region=region, district=district,
+                    station=police_station).first()
+            elif report in ('ncjf'):
+                flow_data_obj = FlowData.query.filter_by(
+                    year=year, month=month, report_type=report, region=region, district=district,
+                    court=court).first()
+
             if flow_data_obj:
                 # click.echo("+++++++++++++")
                 # click.echo(flow_data_obj.values)
@@ -605,6 +631,9 @@ def load_legacy_data(filename, report):
 
                 # click.echo(new_values_obj)
                 flow_data_obj.values = new_values_obj
+                if report in ('ncjf'):
+                    flow_data_obj.msisdn = msisdn
+                    flow_data_obj.updated = datetime.datetime.now()
                 print("XXXXXXXXX=>", flow_data_obj.id, flow_data_obj.year)
                 db.session.commit()
 
