@@ -484,7 +484,7 @@ DROP VIEW IF EXISTS ncjf_childvictim_cases_stats_view;
 CREATE VIEW ncjf_childvictim_cases_stats_view AS
     SELECT
         sum(imprisoned_perpetrators) imprisoned,
-        sum(acquited_perpetrators) acquited,
+        sum(acquitted_perpetrators) acquited,
         sum(fined_perpetrators) fined,
         CASE
             WHEN sum(cvc) > 0 THEN -- total child victim cases
