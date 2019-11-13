@@ -261,7 +261,7 @@ CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
         (a.values->>'bailed')::int bailed,
         (a.values->>'perpetrators')::int perpetrators,
         (a.values->>'imprisoned_perpetrators')::int imprisoned_perpetrators,
-        (a.values->>'acquited_perpetrators')::int acquited_perpetrators,
+        (a.values->>'acquitted_perpetrators')::int acquitted_perpetrators,
         (a.values->>'fined_perpetrators')::int fined_perpetrators,
         (a.values->>'specialreferrals')::int specialreferrals,
         (a.values->>'caseswithdrawn')::int caseswithdrawn,
