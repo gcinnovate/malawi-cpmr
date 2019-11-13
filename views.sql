@@ -509,7 +509,7 @@ CREATE VIEW ncjf_childvictim_cases_stats_view AS
         -- END AS bailed,
         sum(preliminaryinquiry_diverted) preliminaryinquiry_diverted,
         sum(aftertrial_diverted) aftertrial_diverted,
-        sum(reformatories_custodialorder),
+        sum(reformatories_custodialorder) reformatories_custodialorder,
         -- CASE
         --     WHEN sum(inconflict) > 0 THEN -- total child victim cases
         --         round((((sum(reformatories_custodialorder)+0.0)/sum(inconflict))*100)::numeric, 2)
