@@ -94,7 +94,7 @@ INDICATORS = {
         'childguardianship_cbctype', 'childaccess_cbctype', 'cbctype', 'fromprevmonth_inconflict',
         'newlyregistered_inconflict', 'newlyregconcluded_inconflict', 'concluded_inconflict', 'inconflict',
         'preliminaryenquiry_diverted', 'aftertrial_diverted', 'diverted', 'bailed',
-        'total_custodialorder', 'reformatories_custodialorder', 'prisons_custodialorder', 'remanded_total',
+        'total_custodialorder', 'reformatories_custodialorder', 'prisons_custodialorder', 'total_remanded',
         'safetyhomes_remanded', 'reformatorycentres_remanded', 'policecells_remanded', 'specialreferrals',
     ],
     'cvsu': [
