@@ -486,44 +486,48 @@ CREATE VIEW ncjf_childvictim_cases_stats_view AS
         sum(imprisoned_perpetrators) imprisoned,
         sum(acquitted_perpetrators) acquited,
         sum(fined_perpetrators) fined,
-        CASE
-            WHEN sum(cvc) > 0 THEN -- total child victim cases
-                round((((sum(caseswithdrawn)+0.0)/sum(cvc))*100)::numeric, 2)
-            ELSE
-                0
-        END AS caseswithdrawn,
-        CASE
-            WHEN sum(cvc) > 0 THEN -- total child victim cases
-                round((((sum(referredchildsurvivors)+0.0)/sum(cvc))*100)::numeric, 2)
-            ELSE
-                0
-        END AS referredchildsurvivors,
-
-        CASE
-            WHEN sum(inconflict) > 0 THEN -- total child victim cases
-                round((((sum(bailed)+0.0)/sum(inconflict))*100)::numeric, 2)
-            ELSE
-                0
-        END AS bailed,
+        sum(caseswithdrawn) caseswithdrawn,
+        sum(referredchildsurvivors) referredchildsurvivors,
+        --CASE
+        --    WHEN sum(cvc) > 0 THEN -- total child victim cases
+        --        round((((sum(caseswithdrawn)+0.0)/sum(cvc))*100)::numeric, 2)
+        --    ELSE
+        --        0
+        --END AS caseswithdrawn,
+        --CASE
+        --    WHEN sum(cvc) > 0 THEN -- total child victim cases
+        --        round((((sum(referredchildsurvivors)+0.0)/sum(cvc))*100)::numeric, 2)
+        --    ELSE
+        --        0
+        --END AS referredchildsurvivors,
+        sum(bailed) bailed,
+        -- CASE
+        --     WHEN sum(inconflict) > 0 THEN -- total child victim cases
+        --         round((((sum(bailed)+0.0)/sum(inconflict))*100)::numeric, 2)
+        --     ELSE
+        --         0
+        -- END AS bailed,
         sum(preliminaryinquiry_diverted) preliminaryinquiry_diverted,
         sum(aftertrial_diverted) aftertrial_diverted,
-        CASE
-            WHEN sum(inconflict) > 0 THEN -- total child victim cases
-                round((((sum(reformatories_custodialorder)+0.0)/sum(inconflict))*100)::numeric, 2)
-            ELSE
-                0
-        END AS reformatories_custodialorder,
+        sum(reformatories_custodialorder),
+        -- CASE
+        --     WHEN sum(inconflict) > 0 THEN -- total child victim cases
+        --         round((((sum(reformatories_custodialorder)+0.0)/sum(inconflict))*100)::numeric, 2)
+        --     ELSE
+        --         0
+        -- END AS reformatories_custodialorder,
         sum(prisons_custodialorder) prisons_custodialorder,
         --
         sum(safetyhomes_remanded) safetyhomes_remanded,
         sum(reformatorycentres_remanded) reformatorycentres_remanded,
         sum(policecells_remanded) policecells_remanded,
-        CASE
-            WHEN sum(inconflict) > 0 THEN -- total child victim cases
-                round((((sum(specialreferrals)+0.0)/sum(inconflict))*100)::numeric, 2)
-            ELSE
-                0
-        END AS specialreferrals,
+        sum(specialreferrals) specialreferrals,
+        -- CASE
+        --     WHEN sum(inconflict) > 0 THEN -- total child victim cases
+        --         round((((sum(specialreferrals)+0.0)/sum(inconflict))*100)::numeric, 2)
+        --     ELSE
+        --         0
+        -- END AS specialreferrals,
         'National':: text as nation,
         month, rdate
     FROM
