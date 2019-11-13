@@ -404,7 +404,7 @@ def refresh_pvsu_casetypes():
     print(records)
     for r in records:
         summary = SummaryCases.query.filter_by(
-            casetype=r[0], month=r[2], year=r[3],
+            casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3],
             report_type='ncjf', summary_for='nation', summary_slug='childvictim_categories').first()
         if summary:
             summary.value = r[1]
