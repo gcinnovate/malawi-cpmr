@@ -264,8 +264,8 @@ CREATE OR REPLACE VIEW flow_data_ncjf_view  AS
         (a.values->>'acquitted_perpetrators')::int acquitted_perpetrators,
         (a.values->>'fined_perpetrators')::int fined_perpetrators,
         (a.values->>'specialreferrals')::int specialreferrals,
-        (a.values->>'caseswithdrawn')::int caseswithdrawn,
-        (a.values->>'referredchildsurvivors')::int referredchildsurvivors,
+        (a.values->>'caseswithdrawn')::numeric::int caseswithdrawn,
+        (a.values->>'referredchildsurvivors')::numeric::int referredchildsurvivors,
         created,
         CASE
             WHEN a.month ~ '(0[13578]|1[02])$' THEN
