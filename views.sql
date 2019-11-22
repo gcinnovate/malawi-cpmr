@@ -19,6 +19,8 @@ DROP VIEW IF EXISTS flow_data_diversion_view_southern;
 DROP VIEW IF EXISTS flow_data_diversion_view_northern;
 DROP VIEW IF EXISTS flow_data_diversion_view_central;
 --
+DROP VIEW IF EXISTS summary_cases_view_ncjf;
+DROP VIEW IF EXISTS summary_cases_view_mog;
 DROP VIEW IF EXISTS summary_cases_view_eastern;
 DROP VIEW IF EXISTS summary_cases_view_southern;
 DROP VIEW IF EXISTS summary_cases_view_northern;
@@ -343,6 +345,15 @@ CREATE OR REPLACE VIEW summary_cases_view  AS
         LEFT OUTER JOIN locations AS c ON a.region = c.id
         LEFT OUTER JOIN police_stations AS d ON a.station = d.id
         LEFT OUTER JOIN justice_courts AS e ON a.court = e.id;
+
+DROP VIEW IF EXISTS summary_cases_view_ncjf;
+CREATE VIEW summary_cases_view_ncjf AS
+    SELECT * FROM summary_cases_view WHERE report_type = 'ncjf';
+
+DROP VIEW IF EXISTS summary_cases_view_mog;
+CREATE VIEW summary_cases_view_mog AS
+    SELECT * FROM summary_cases_view WHERE report_type IN ('cc', 'cvsu');
+
 
 -- view for diversion cases dealt with at national level
 DROP VIEW IF EXISTS cases_dealtwith_national_view;
