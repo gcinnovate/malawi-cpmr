@@ -81,6 +81,7 @@ def save_flowdata(
                 if not cvsu_obj:
                     cvsu_obj = CommunityVictimSupportUnit(
                         name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id)
+                    db.session.add(cvsu_obj)
             else:
                 if 'Cvsu' in ta.title():
                     ta = ta.title().replace('Cvsu', 'CVSU')
@@ -114,6 +115,7 @@ def save_flowdata(
                 if not cc_obj:
                     cc_obj = ChildrensCorner(
                         name=childrens_corner.title(), district_id=district_id, ta_id=ta_obj.id)
+                    db.session.add(cc_obj)
             else:
                 if 'Cvsu' in ta.title():
                     ta = ta.title().replace('Cvsu', 'CVSU')
