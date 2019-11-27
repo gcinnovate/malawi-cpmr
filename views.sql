@@ -645,6 +645,7 @@ CREATE VIEW flow_data_cvsu_view_all AS
         (a.values->>'women_total')::int women_total,
         (a.values->>'total_cases')::int total_cases,
         created,
+        updated,
         CASE
             WHEN a.month ~ '(0[13578]|1[02])$' THEN
                 (a.month || '-31')::date
