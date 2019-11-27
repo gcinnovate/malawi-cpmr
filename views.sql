@@ -34,6 +34,7 @@ DROP VIEW IF EXISTS flow_data_pvsu_view_central;
 DROP VIEW IF EXISTS cc_attendance_regional_view;
 DROP VIEW IF EXISTS cvsu_cases_demographics_regional_view;
 DROP VIEW IF EXISTS cvsu_casetypes_regional_view;
+DROP VIEW IF EXISTS flow_data_cvsu_view_all;
 DROP VIEW IF EXISTS flow_data_cvsu_view;
 DROP VIEW IF EXISTS ncjf_childvictim_cases_stats_view;
 DROP VIEW IF EXISTS ncjf_chilcases_concluded_by_courts;
@@ -566,6 +567,78 @@ CREATE OR REPLACE VIEW flow_data_cvsu_view  AS
         (a.values->>'economicabuse')::int economicabuse,
         (a.values->>'maritalconflict')::int maritalconflict,
         (a.values->>'boys_total')::int boys_total,
+        (a.values->>'girls_total')::int girls_total,
+        (a.values->>'men_total')::int men_total,
+        (a.values->>'women_total')::int women_total,
+        (a.values->>'total_cases')::int total_cases,
+        created,
+        CASE
+            WHEN a.month ~ '(0[13578]|1[02])$' THEN
+                (a.month || '-31')::date
+            WHEN a.month ~ '(0[469]|1[1])$' THEN
+                (a.month || '-30')::date
+            ELSE
+                (a.month || '-28')::date
+        END AS rdate,
+        'Malawi'::text AS nation
+    FROM
+        flow_data a
+        LEFT OUTER JOIN locations AS b ON a.district = b.id
+        LEFT OUTER JOIN locations AS c ON a.region = c.id
+        LEFT OUTER JOIN community_victim_support_units AS d ON a.cvsu = d.id
+    WHERE
+        a.report_type = 'cvsu';
+
+DROP VIEW IF EXISTS flow_data_cvsu_view_all;
+CREATE VIEW flow_data_cvsu_view_all AS
+    SELECT
+        a.month, a.year, a.report_type, a.msisdn,
+        c.name AS region,
+        b.name AS district,
+        c.id AS region_id,
+        d.name AS cvsu,
+        (a.values->>'boys_physicalviolence')::int boys_physicalviolence,
+        (a.values->>'girls_physicalviolence')::int girls_physicalviolence,
+        (a.values->>'men_physicalviolence')::int men_physicalviolence,
+        (a.values->>'women_physicalviolence')::int women_physicalviolence,
+        (a.values->>'physicalviolence')::int physicalviolence,
+        (a.values->>'defilement')::int defilement,
+        (a.values->>'boys_sexualviolence')::int boys_sexualviolence,
+        (a.values->>'girls_sexualviolence')::int girls_sexualviolence,
+        (a.values->>'men_sexualviolence')::int men_sexualviolence,
+        (a.values->>'women_sexualviolence')::int women_sexualviolence,
+        (a.values->>'sexualviolence')::int sexualviolence,
+        (a.values->>'boys_childneglect')::int boys_childneglect,
+        (a.values->>'girls_childneglect')::int girls_childneglect,
+        (a.values->>'childneglect')::int childneglect,
+        (a.values->>'boys_childmarriage')::int boys_childmarriage,
+        (a.values->>'girls_childmarriage')::int girls_childmarriage,
+        (a.values->>'childmarriage')::int childmarriage,
+        (a.values->>'boys_emotionalabuse')::int boys_emotionalabuse,
+        (a.values->>'girls_emotionalabuse')::int girls_emotionalabuse,
+        (a.values->>'men_emotionalabuse')::int men_emotionalabuse,
+        (a.values->>'women_emotionalabuse')::int women_emotionalabuse,
+        (a.values->>'emotionalabuse')::int emotionalabuse,
+        (a.values->>'boys_economicexploitation')::int boys_economicexploitation,
+        (a.values->>'girls_economicexploitation')::int girls_economicexploitation,
+        (a.values->>'men_economicexploitation')::int men_economicexploitation,
+        (a.values->>'women_economicexploitation')::int women_economicexploitation,
+        (a.values->>'economicexploitation')::int economicexploitation,
+        (a.values->>'boys_humantrafficking')::int boys_humantrafficking,
+        (a.values->>'girls_humantrafficking')::int girls_humantrafficking,
+        (a.values->>'men_humantrafficking')::int men_humantrafficking,
+        (a.values->>'women_humantrafficking')::int women_humantrafficking,
+        (a.values->>'humantrafficking')::int humantrafficking,
+        (a.values->>'boys_economicabuse')::int boys_economicabuse,
+        (a.values->>'girls_economicabuse')::int girls_economicabuse,
+        (a.values->>'men_economicabuse')::int men_economicabuse,
+        (a.values->>'women_economicabuse')::int women_economicabuse,
+        (a.values->>'economicabuse')::int economicabuse,
+        (a.values->>'boys_maritalconflict')::int boys_maritalconflict,
+        (a.values->>'girls_maritalconflict')::int girls_maritalconflict,
+        (a.values->>'men_maritalconflict')::int men_maritalconflict,
+        (a.values->>'women_maritalconflict')::int women_maritalconflict,
+        (a.values->>'maritalconflict')::int maritalconflict,
         (a.values->>'girls_total')::int girls_total,
         (a.values->>'men_total')::int men_total,
         (a.values->>'women_total')::int women_total,
