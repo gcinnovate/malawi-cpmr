@@ -84,7 +84,7 @@ def save_flowdata(
             else:
                 if 'Cvsu' in ta.title():
                     ta = ta.title().replace('Cvsu', 'CVSU')
-                db.sessin.add(TraditionalAuthority(district_id=district_id, name=ta))
+                db.session.add(TraditionalAuthority(district_id=district_id, name=ta))
                 ta_obj = TraditionalAuthority.query.filter_by(district_id=district_id, name=ta).first()
                 cvsu_obj = CommunityVictimSupportUnit(name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id)
                 db.session.add(cvsu_obj)
@@ -117,7 +117,7 @@ def save_flowdata(
             else:
                 if 'Cvsu' in ta.title():
                     ta = ta.title().replace('Cvsu', 'CVSU')
-                db.sessin.add(TraditionalAuthority(district_id=district_id, name=ta))
+                db.session.add(TraditionalAuthority(district_id=district_id, name=ta))
                 ta_obj = TraditionalAuthority.query.filter_by(district_id=district_id, name=ta).first()
                 cc_obj = ChildrensCorner(name=childrens_corner, district_id=district_id, ta_id=ta_obj.id)
                 db.session.add(cc_obj)
