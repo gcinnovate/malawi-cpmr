@@ -639,6 +639,7 @@ CREATE VIEW flow_data_cvsu_view_all AS
         (a.values->>'men_maritalconflict')::int men_maritalconflict,
         (a.values->>'women_maritalconflict')::int women_maritalconflict,
         (a.values->>'maritalconflict')::int maritalconflict,
+        (a.values->>'boys_total')::int boys_total,
         (a.values->>'girls_total')::int girls_total,
         (a.values->>'men_total')::int men_total,
         (a.values->>'women_total')::int women_total,
