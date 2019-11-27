@@ -83,6 +83,7 @@ def save_flowdata(
                     cvsu_obj = CommunityVictimSupportUnit(
                         name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id)
                     db.session.add(cvsu_obj)
+                    db.session.commit()
             else:
                 logger.info('TA Object NOT Found for TA:{0}'.format(ta))
                 if 'Cvsu' in ta.title():
@@ -93,6 +94,7 @@ def save_flowdata(
                 ta_obj = TraditionalAuthority.query.filter_by(district_id=district_id, name=ta).first()
                 cvsu_obj = CommunityVictimSupportUnit(name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id)
                 db.session.add(cvsu_obj)
+                db.session.commit()
 
             value_record = FlowData.query.filter_by(
                 year=year, month=month_str, cvsu=cvsu_obj.id, report_type=report_type).first()
@@ -125,6 +127,7 @@ def save_flowdata(
                     cc_obj = ChildrensCorner(
                         name=childrens_corner.title(), district_id=district_id, ta_id=ta_obj.id)
                     db.session.add(cc_obj)
+                    db.session.commit()
             else:
                 logger.info('TA Object NOT Found for TA:{0}'.format(ta))
                 if 'Cvsu' in ta.title():
@@ -135,6 +138,7 @@ def save_flowdata(
                 ta_obj = TraditionalAuthority.query.filter_by(district_id=district_id, name=ta).first()
                 cc_obj = ChildrensCorner(name=childrens_corner, district_id=district_id, ta_id=ta_obj.id)
                 db.session.add(cc_obj)
+                db.session.commit()
 
             value_record = FlowData.query.filter_by(
                 year=year, month=month_str, children_corner=cc_obj.id,
