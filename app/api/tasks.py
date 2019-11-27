@@ -76,6 +76,7 @@ def save_flowdata(
             ta_obj = TraditionalAuthority.query.filter_by(
                 district_id=district_id).filter(TraditionalAuthority.name.ilike(ta)).first()
             if ta_obj:
+                logger.info('TA Object Found for TA:{0}'.format(ta))
                 cvsu_obj = CommunityVictimSupportUnit.query.filter_by(
                     name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id).first()
                 if not cvsu_obj:
@@ -83,8 +84,11 @@ def save_flowdata(
                         name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id)
                     db.session.add(cvsu_obj)
             else:
+                logger.info('TA Object NOT Found for TA:{0}'.format(ta))
                 if 'Cvsu' in ta.title():
                     ta = ta.title().replace('Cvsu', 'CVSU')
+                else:
+                    ta = ta.title()
                 db.session.add(TraditionalAuthority(district_id=district_id, name=ta))
                 ta_obj = TraditionalAuthority.query.filter_by(district_id=district_id, name=ta).first()
                 cvsu_obj = CommunityVictimSupportUnit(name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id)
@@ -94,10 +98,14 @@ def save_flowdata(
                 year=year, month=month_str, cvsu=cvsu_obj.id, report_type=report_type).first()
 
             if value_record:
+                logger.info('Values Record Object Found: MSISDN:{0}, Month: {1}, CVSU: {2}'.format(
+                    msisdn, month_str, cvsu))
                 value_record.values = flowdata
                 value_record.msisdn = msisdn
                 value_record.updated = datetime.now()
             else:
+                logger.info('NO Values Record Object Found: MSISDN:{0}, Month: {1}, CVSU: {2}'.format(
+                    msisdn, month_str, cvsu))
                 db.session.add(FlowData(
                     msisdn=msisdn, district=district_id, region=region_id, cvsu=cvsu_obj.id,
                     report_type=report_type, month=month_str, year=year, values=flowdata))
@@ -110,6 +118,7 @@ def save_flowdata(
             ta_obj = TraditionalAuthority.query.filter_by(
                 district_id=district_id).filter(TraditionalAuthority.name.ilike(ta)).first()
             if ta_obj:
+                logger.info('TA Object Found for TA:{0}'.format(ta))
                 cc_obj = ChildrensCorner.query.filter_by(
                     name=childrens_corner.title(), district_id=district_id, ta_id=ta_obj.id).first()
                 if not cc_obj:
@@ -117,8 +126,11 @@ def save_flowdata(
                         name=childrens_corner.title(), district_id=district_id, ta_id=ta_obj.id)
                     db.session.add(cc_obj)
             else:
+                logger.info('TA Object NOT Found for TA:{0}'.format(ta))
                 if 'Cvsu' in ta.title():
                     ta = ta.title().replace('Cvsu', 'CVSU')
+                else:
+                    ta = ta.title()
                 db.session.add(TraditionalAuthority(district_id=district_id, name=ta))
                 ta_obj = TraditionalAuthority.query.filter_by(district_id=district_id, name=ta).first()
                 cc_obj = ChildrensCorner(name=childrens_corner, district_id=district_id, ta_id=ta_obj.id)
@@ -129,10 +141,14 @@ def save_flowdata(
                 report_type=report_type).first()
 
             if value_record:
+                logger.info('Values Record Object Found: MSISDN:{0}, Month: {1}, CC: {2}'.format(
+                    msisdn, month_str, childrens_corner))
                 value_record.values = flowdata
                 value_record.msisdn = msisdn
                 value_record.updated = datetime.now()
             else:
+                logger.info('NO Values Record Object Found: MSISDN:{0}, Month: {1}, CC: {2}'.format(
+                    msisdn, month_str, childrens_corner))
                 db.session.add(FlowData(
                     msisdn=msisdn, district=district_id, region=region_id, children_corner=cc_obj.id,
                     report_type=report_type, month=month_str, year=year, values=flowdata))
