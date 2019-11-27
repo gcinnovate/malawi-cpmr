@@ -138,4 +138,4 @@ def save_flowdata(
             db.session.commit()
         logger.info('Done processing flow values')
     else:
-        logger.info("district ids empty")
+        logger.info("district ids empty for MSISDN: {0}, District: {1}".format(msisdn, district))
