@@ -597,6 +597,7 @@ CREATE VIEW flow_data_cvsu_view_all AS
         b.name AS district,
         c.id AS region_id,
         d.name AS cvsu,
+        e.name AS ta,
         (a.values->>'boys_physicalviolence')::int boys_physicalviolence,
         (a.values->>'girls_physicalviolence')::int girls_physicalviolence,
         (a.values->>'men_physicalviolence')::int men_physicalviolence,
@@ -660,6 +661,7 @@ CREATE VIEW flow_data_cvsu_view_all AS
         LEFT OUTER JOIN locations AS b ON a.district = b.id
         LEFT OUTER JOIN locations AS c ON a.region = c.id
         LEFT OUTER JOIN community_victim_support_units AS d ON a.cvsu = d.id
+        LEFT OUTER JOIN traditional_authorities AS e ON d.ta_id = e.id
     WHERE
         a.report_type = 'cvsu';
 
@@ -702,6 +704,7 @@ CREATE VIEW flow_data_cc_view AS
         b.name AS district,
         c.id AS region_id,
         d.name AS childrens_corner,
+        e.name AS ta,
         b.longitude::numeric, b.latitude::numeric,
         ceil((a.values->>'boys_attendance')::numeric)::int boys_attendance,
         ceil((a.values->>'girls_attendance')::numeric)::int girls_attendance,
@@ -733,6 +736,7 @@ CREATE VIEW flow_data_cc_view AS
         LEFT OUTER JOIN locations AS b ON a.district = b.id
         LEFT OUTER JOIN locations AS c ON a.region = c.id
         LEFT OUTER JOIN childrens_corners AS d ON a.children_corner = d.id
+        LEFT OUTER JOIN traditional_authorities AS e ON d.ta_id = e.id
     WHERE
         a.report_type = 'cc';
 
