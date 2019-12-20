@@ -21,7 +21,7 @@ def save_flowdata(
     flowdata = get_indicators_from_rapidpro_results(
         request_json['results'], INDICATORS, report_type)
     month = flowdata.pop('month')
-    if month == 'December' or MONTHS_DICT[month] > datetime.now().month:
+    if report_type in ('pvsu', 'diversion') and (month == 'December' or MONTHS_DICT[month] > datetime.now().month):
         year = datetime.now().year - 1
     else:
         year = datetime.now().year
