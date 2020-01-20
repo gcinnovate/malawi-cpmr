@@ -23,9 +23,15 @@ def save_flowdata(
     month = flowdata.pop('month')
     if report_type in ('pvsu', 'diversion') and (month == 'December' or MONTHS_DICT[month] > datetime.now().month):
         year = datetime.now().year - 1
+    elif report_type in ('ncjf', 'mog'):
+        if year in flowdata:
+            year = flowdata.pop('year')
+        else:
+            if (month == 'December' or MONTHS_DICT[month] > datetime.now().month):
+                year = datetime.now().year - 1
+            else:
+                year = datetime.now().year
     else:
-        year = datetime.now().year
-    if report_type in ('ncjf'):
         year = datetime.now().year
 
     month_str = "{0}-{1:02}".format(year, MONTHS_DICT[month])
