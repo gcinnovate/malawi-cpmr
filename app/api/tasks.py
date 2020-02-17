@@ -56,7 +56,12 @@ def save_flowdata(
                 db.session.add(FlowData(
                     msisdn=msisdn, district=district_id, region=region_id, station=police_station,
                     report_type=report_type, month=month_str, year=year, values=flowdata))
-            db.session.commit()
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                logger.info('DB ERROR: [PVSU-Diversoin] [MSISDN: {0}, District: {1}, Court: {2}] [MONTH: {3}]'.format(
+                    msisdn, district, station, month_str))
 
         elif report_type == 'ncjf':
             logger.info('Handling NCJF Data for MSISDN: {0}'.format(msisdn))
@@ -75,7 +80,12 @@ def save_flowdata(
                     db.session.add(FlowData(
                         msisdn=msisdn, district=district_id, region=region_id, court=court,
                         report_type=report_type, month=month_str, year=year, values=flowdata))
-                db.session.commit()
+                try:
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    logger.info('DB ERROR -Save Data: [NCJF] [MSISDN: {0}, District: {1}, Court: {2}] [MONTH: {3}]'.format(
+                        msisdn, district, station, month_str))
 
         elif report_type == 'cvsu':
             ta = request_args.get('traditional_authority', '')
@@ -91,7 +101,13 @@ def save_flowdata(
                     cvsu_obj = CommunityVictimSupportUnit(
                         name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id)
                     db.session.add(cvsu_obj)
-                    db.session.commit()
+                    try:
+                        db.session.commit()
+                    except:
+                        db.session.rollback()
+                        logger.info(
+                            'DB ERROR - Add CVSU: [CVSU] [MSISDN: {0}, District: {1}, TA: {2}, CVSU: {3}] [MONTH: {4}]'.format(
+                                msisdn, district, ta, cvsu, month_str))
             else:
                 logger.info('TA Object NOT Found for TA:{0}'.format(ta))
                 if 'Cvsu' in ta.title():
@@ -102,7 +118,13 @@ def save_flowdata(
                 ta_obj = TraditionalAuthority.query.filter_by(district_id=district_id, name=ta).first()
                 cvsu_obj = CommunityVictimSupportUnit(name=cvsu.title(), district_id=district_id, ta_id=ta_obj.id)
                 db.session.add(cvsu_obj)
-                db.session.commit()
+                try:
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    logger.info(
+                        'DB ERROR - Add CVSU: [CVSU] [MSISDN: {0}, District: {1}, TA: {2}, CVSU: {3}] [MONTH: {4}]'.format(
+                            msisdn, district, ta, cvsu, month_str))
 
             value_record = FlowData.query.filter_by(
                 year=year, month=month_str, cvsu=cvsu_obj.id, report_type=report_type).first()
@@ -119,7 +141,13 @@ def save_flowdata(
                 db.session.add(FlowData(
                     msisdn=msisdn, district=district_id, region=region_id, cvsu=cvsu_obj.id,
                     report_type=report_type, month=month_str, year=year, values=flowdata))
-            db.session.commit()
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                logger.info(
+                    'DB ERROR - Save Data: [CVSU] [MSISDN: {0}, District: {1}, TA: {2}, CVSU: {3}] [MONTH: {4}]'.format(
+                        msisdn, district, ta, cvsu, month_str))
 
         elif report_type == 'cc':
             logger.info('Handling CC Data for MSISDN: {0}'.format(msisdn))
@@ -135,7 +163,13 @@ def save_flowdata(
                     cc_obj = ChildrensCorner(
                         name=childrens_corner.title(), district_id=district_id, ta_id=ta_obj.id)
                     db.session.add(cc_obj)
-                    db.session.commit()
+                    try:
+                        db.session.commit()
+                    except:
+                        db.session.rollback()
+                        logger.info(
+                            'DB ERROR - Add CC: [CC] [MSISDN: {0}, District: {1}, TA: {2}, CC: {3}] [MONTH: {4}]'.format(
+                                msisdn, district, ta, childrens_corner, month_str))
             else:
                 logger.info('TA Object NOT Found for TA:{0}'.format(ta))
                 if 'Cvsu' in ta.title():
@@ -146,7 +180,13 @@ def save_flowdata(
                 ta_obj = TraditionalAuthority.query.filter_by(district_id=district_id, name=ta).first()
                 cc_obj = ChildrensCorner(name=childrens_corner, district_id=district_id, ta_id=ta_obj.id)
                 db.session.add(cc_obj)
-                db.session.commit()
+                try:
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    logger.info(
+                        'DB ERROR - Add CC: [CC] [MSISDN: {0}, District: {1}, TA: {2}, CC: {3}] [MONTH: {4}]'.format(
+                            msisdn, district, ta, childrens_corner, month_str))
 
             value_record = FlowData.query.filter_by(
                 year=year, month=month_str, children_corner=cc_obj.id,
@@ -164,8 +204,13 @@ def save_flowdata(
                 db.session.add(FlowData(
                     msisdn=msisdn, district=district_id, region=region_id, children_corner=cc_obj.id,
                     report_type=report_type, month=month_str, year=year, values=flowdata))
-
-            db.session.commit()
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                logger.info(
+                    'DB ERROR - Save Data: [CC] [MSISDN: {0}, District: {1}, TA: {2}, CC: {3}] [MONTH: {4}]'.format(
+                        msisdn, district, ta, childrens_corner, month_str))
         logger.info('Done processing flow values')
     else:
         logger.info("district ids empty for MSISDN: {0}, District: {1}".format(msisdn, district))
