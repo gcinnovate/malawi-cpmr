@@ -61,19 +61,21 @@ def save_flowdata(
         elif report_type == 'ncjf':
             logger.info('Handling NCJF Data for MSISDN: {0}'.format(msisdn))
             station = request_args.get('station').title()
+            # XXX
             court = jcourts.get(station, '')
-            value_record = FlowData.query.filter_by(
-                year=year, month=month_str, court=court, report_type=report_type).first()
+            if court:
+                value_record = FlowData.query.filter_by(
+                    year=year, month=month_str, court=court, report_type=report_type).first()
 
-            if value_record:
-                value_record.values = flowdata
-                value_record.msisdn = msisdn
-                value_record.updated = datetime.now()
-            else:
-                db.session.add(FlowData(
-                    msisdn=msisdn, district=district_id, region=region_id, court=court,
-                    report_type=report_type, month=month_str, year=year, values=flowdata))
-            db.session.commit()
+                if value_record:
+                    value_record.values = flowdata
+                    value_record.msisdn = msisdn
+                    value_record.updated = datetime.now()
+                else:
+                    db.session.add(FlowData(
+                        msisdn=msisdn, district=district_id, region=region_id, court=court,
+                        report_type=report_type, month=month_str, year=year, values=flowdata))
+                db.session.commit()
 
         elif report_type == 'cvsu':
             ta = request_args.get('traditional_authority', '')
