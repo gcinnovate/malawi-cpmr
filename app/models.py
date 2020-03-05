@@ -80,6 +80,13 @@ class ChildrensCorner(db.Model):
     name = db.Column(db.String(64), index=True)
 
 
+class OneStopCenter(db.Model):
+    __tablename__ = 'one_stop_centers'
+    id = db.Column(db.Integer, primary_key=True)
+    district_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
+    name = db.Column(db.String(64), index=True)
+
+
 class FlowData(db.Model, TimeStampMixin):
     """To hold flow data from RapidPro"""
     __tablename__ = 'flow_data'
@@ -90,6 +97,7 @@ class FlowData(db.Model, TimeStampMixin):
     court = db.Column(db.Integer, db.ForeignKey('justice_courts.id'))
     cvsu = db.Column(db.Integer, db.ForeignKey('community_victim_support_units.id'))
     children_corner = db.Column(db.Integer, db.ForeignKey('childrens_corners.id'))
+    one_stop_center = db.Column(db.Integer, db.ForeignKey('one_stop_centers.id'))
     report_type = db.Column(db.String(), index=True)
     msisdn = db.Column(db.String(), index=True)
     month = db.Column(db.String(), index=True)

@@ -1,6 +1,6 @@
 from .. import db, celery, INDICATORS
 from ..models import (
-    FlowData, TraditionalAuthority, ChildrensCorner, CommunityVictimSupportUnit)
+    FlowData, TraditionalAuthority, ChildrensCorner, CommunityVictimSupportUnit, OneStopCenter)
 from ..utils import get_indicators_from_rapidpro_results
 from datetime import datetime
 import calendar
@@ -17,13 +17,16 @@ def save_flowdata(
     msisdn = request_args.get('msisdn')
     report_type = request_args.get('report_type')
     district = request_args.get('district').title()
+    if not request_json:
+        logger.info("EMPTY Post Data from RapidPro! [Report: {0}, MSISDN: {1}]".format(report_type, msisdn))
+        return
 
     flowdata = get_indicators_from_rapidpro_results(
         request_json['results'], INDICATORS, report_type)
     month = flowdata.pop('month')
     if report_type in ('pvsu', 'diversion') and (month == 'December' or MONTHS_DICT[month] > datetime.now().month):
         year = datetime.now().year - 1
-    elif report_type in ('ncjf', 'cc', 'cvsu'):
+    elif report_type in ('ncjf', 'cc', 'cvsu', 'osc'):
         if 'year' in flowdata:
             year = flowdata.pop('year')
         else:
@@ -211,6 +214,55 @@ def save_flowdata(
                 logger.info(
                     'DB ERROR - Save Data: [CC] [MSISDN: {0}, District: {1}, TA: {2}, CC: {3}] [MONTH: {4}]'.format(
                         msisdn, district, ta, childrens_corner, month_str))
+
+        # Handle One Stop Center data
+        elif report_type == 'osc':
+            one_stop_center = request_args.get('one_stop_center').title()
+            logger.info('Handling OSC Data [MSISDN: {0}, District: {1}, OSC: {2}]'.format(msisdn, district, one_stop_center))
+            if one_stop_center:
+                osc_obj = OneStopCenter.query.filter_by(
+                    district_id=district_id).filter(OneStopCenter.name.ilike(one_stop_center)).first()
+                if osc_obj:
+                    logger.info('OSC Object Found for OSC: {0}'.format(one_stop_center))
+                else:
+                    db.session.add(OneStopCenter(district_id=district_id, name=one_stop_center.title()))
+                    osc_obj = OneStopCenter.query.filter_by(district_id=district_id, name=one_stop_center).first()
+                    try:
+                        db.session.commit()
+                    except:
+                        db.session.rollback()
+                        logger.info(
+                            'DB ERROR - Add OSC: [CC] [MSISDN: {0}, District: {1}, OSC: {2}] [MONTH: {4}]'.format(
+                                msisdn, district, one_stop_center, month_str))
+
+                # save the data
+                value_record = FlowData.query.filter_by(
+                    year=year, month=month_str, one_stop_center=osc_obj.id,
+                    report_type=report_type).first()
+                if value_record:
+                    logger.info('Values Record Object Found: MSISDN:{0}, Month: {1}, OSC: {2}'.format(
+                        msisdn, month_str, one_stop_center))
+                    value_record.values = flowdata
+                    value_record.msisdn = msisdn
+                    value_record.updated = datetime.now()
+                else:
+                    logger.info('NO Values Record Object Found: MSISDN:{0}, Month: {1}, OSC: {2}'.format(
+                        msisdn, month_str, one_stop_center))
+                    db.session.add(FlowData(
+                        msisdn=msisdn, district=district_id, region=region_id, one_stop_center=osc_obj.id,
+                        report_type=report_type, month=month_str, year=year, values=flowdata))
+                try:
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    logger.info(
+                        'DB ERROR - Save Data: [OSC] [MSISDN: {0}, District: {1}, OSC: {2}] [MONTH: {3}]'.format(
+                            msisdn, district, one_stop_center, month_str))
+            else:
+                logger.info(
+                    "OSC Data: One Stop Center missing [MSISDN: {0}, District: {1}, OSC: {2}]".format(
+                        msisdn, district, one_stop_center))
+
         logger.info('Done processing flow values')
     else:
         logger.info("district ids empty for MSISDN: {0}, District: {1}".format(msisdn, district))

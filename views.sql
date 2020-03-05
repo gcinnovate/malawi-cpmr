@@ -750,6 +750,74 @@ CREATE VIEW cc_attendance_regional_view AS
     FROM flow_data_cc_view
     GROUP BY month, year, region_id;
 
+-- view for all OSC data
+DROP VIEW IF EXISTS flow_data_osc_view;
+CREATE OR REPLACE VIEW flow_data_osc_view  AS
+    SELECT
+        a.month, a.year, a.report_type, a.msisdn,
+        1 AS nation,
+        c.name AS region,
+        c.id AS region_id,
+        b.name AS district,
+        d.name AS one_stop_center,
+        (a.values->>'boys_physicalviolence')::int boys_physicalviolence,
+        (a.values->>'girls_physicalviolence')::int girls_physicalviolence,
+        (a.values->>'men_physicalviolence')::int men_physicalviolence,
+        (a.values->>'women_physicalviolence')::int women_physicalviolence,
+        (a.values->>'physicalviolence')::int physicalviolence,
+        (a.values->>'boys_sexualviolence')::int boys_sexualviolence,
+        (a.values->>'girls_sexualviolence')::int girls_sexualviolence,
+        (a.values->>'men_sexualviolence')::int men_sexualviolence,
+        (a.values->>'women_sexualviolence')::int women_sexualviolence,
+        (a.values->>'sexualviolence')::int sexualviolence,
+        (a.values->>'boys_psychosocialsupport')::int boys_psychosocialsupport,
+        (a.values->>'girls_psychosocialsupport')::int girls_psychosocialsupport,
+        (a.values->>'men_psychosocialsupport')::int men_psychosocialsupport,
+        (a.values->>'women_psychosocialsupport')::int women_psychosocialsupport,
+        (a.values->>'psychosocialsupport')::int psychosocialsupport,
+        (a.values->>'male_perpetrators_physicalviolence')::int male_perpetrators_physicalvionce,
+        (a.values->>'female_perpetrators_physicalviolence')::int female_perpetrators_physicalvionce,
+        (a.values->>'male_perpetrators_sexualviolence')::int male_perpetrators_sexualviolence,
+        (a.values->>'female_perpetrators_sexualviolence')::int female_perpetrators_sexualviolence,
+        (a.values->>'parents_relation_physicalviolence')::int parents_relation_physicalviolence,
+        (a.values->>'relatives_relation_physicalviolence')::int relatives_relation_physicalviolence,
+        (a.values->>'boygirlfriend_relation_physicalviolence')::int boygirlfriend_relation_physicalviolence,
+        (a.values->>'husbandwife_relation_physicalviolence')::int husbandwife_relation_physicalviolence,
+        (a.values->>'victimknows_relation_physicalviolence')::int victimknows_relation_physicalviolence,
+        (a.values->>'strangers_relation_physicalviolence')::int strangers_relation_physicalviolence,
+        (a.values->>'parents_relation_sexualviolence')::int parents_relation_sexualviolence,
+        (a.values->>'relatives_relation_sexualviolence')::int relatives_relation_sexualviolence,
+        (a.values->>'boygirlfriend_relation_sexualviolence')::int boygirlfriend_relation_sexualviolence,
+        (a.values->>'husbandwife_relation_sexualviolence')::int husbandwife_relation_sexualviolence,
+        (a.values->>'victimknows_relation_sexualviolence')::int victimknows_relation_sexualviolence,
+        (a.values->>'strangers_relation_sexualviolence')::int strangers_relation_sexualviolence,
+        (a.values->>'referredfrom_self')::int referredfrom_self,
+        (a.values->>'referredfrom_socailwelfare')::int referredfrom_socailwelfare,
+        (a.values->>'referredfrom_police')::int referredfrom_police,
+        (a.values->>'referredfrom_hospital')::int referredfrom_hospital,
+        (a.values->>'referredfrom_others')::int referredfrom_others,
+        (a.values->>'male_feltsafe')::int male_feltsafe,
+        (a.values->>'female_feltsafe')::int female_feltsafe,
+        (a.values->>'male_feltunsafe')::int male_feltunsafe,
+        (a.values->>'female_feltunsafe')::int female_feltunsafe,
+        created,
+        CASE
+            WHEN a.month ~ '(0[13578]|1[02])$' THEN
+                (a.month || '-31')::date
+            WHEN a.month ~ '(0[469]|1[1])$' THEN
+                (a.month || '-30')::date
+            ELSE
+                (a.month || '-28')::date
+        END AS rdate
+    FROM
+        flow_data a
+        LEFT OUTER JOIN locations AS b ON a.district = b.id
+        LEFT OUTER JOIN locations AS c ON a.region = c.id
+        LEFT OUTER JOIN one_stop_centers AS d ON a.one_stop_center = d.id
+    WHERE
+        a.report_type = 'osc';
+
+
 
 -- Create region level views to help with permissions
 DROP VIEW IF EXISTS flow_data_pvsu_view_eastern;

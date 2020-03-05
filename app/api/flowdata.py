@@ -39,5 +39,8 @@ def flowdata_webhook():
         # tas = redis_client.traditional_auths
         save_flowdata.delay(
             request.args, request.json, districts)
+    elif report_type == 'osc':
+        save_flowdata.delay(
+            request.args, request.json, districts)
 
     return jsonify({'message': 'success'})

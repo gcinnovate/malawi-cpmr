@@ -152,6 +152,8 @@ def load_test_data(report, start_year, end_year, start_month, end_month, init, l
         stations = CommunityVictimSupportUnit.query.all()
     elif report == 'cc':
         stations = ChildrensCorner.query.all()
+    elif report == 'osc':
+        stations = OneStopCenter.query.all()
 
     year = datetime.datetime.now().year
     if start_year == end_year:
@@ -225,6 +227,14 @@ def load_test_data(report, start_year, end_year, start_month, end_month, init, l
                     if not flow_data_obj:
                         db.session.add(FlowData(
                             region=region_id, district=district_id, children_corner=p.id,
+                            month=month_str, year=y, report_type=report, values=values))
+                elif report == 'osc':
+                    flow_data_obj = FlowData.query.filter_by(
+                        year=y, month=month_str, region=region_id, district=district_id,
+                        one_stop_center=p.id, report_type=report).first()
+                    if not flow_data_obj:
+                        db.session.add(FlowData(
+                            region=region_id, district=district_id, one_stop_center=p.id,
                             month=month_str, year=y, report_type=report, values=values))
 
                 click.echo(values)

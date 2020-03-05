@@ -83,7 +83,7 @@ INDICATORS = {
         'boys_releasedin48hrs', 'girls_releasedin48hrs',
     ],
     'ncjf': [
-        'month',
+        'month', 'year',
         'fromprevmonth_cvc', 'newlyregistered_cvc', 'newlyregconcluded_cvc', 'concluded_cvc',
         'defilement_cvccategory', 'childmarriage_cvccategory', 'childtrafficking_cvccategory',
         'sexualviolence_cvccategory', 'concluded', 'total_childcases',
@@ -98,7 +98,7 @@ INDICATORS = {
         'safetyhomes_remanded', 'reformatorycentres_remanded', 'policecells_remanded', 'specialreferrals',
     ],
     'cvsu': [
-        'month', 'physicalviolence', 'defilement', 'sexualviolence', 'childneglect', 'childmarriage',
+        'month', 'year', 'physicalviolence', 'defilement', 'sexualviolence', 'childneglect', 'childmarriage',
         'emotionalabuse', 'economicexploitation', 'economicabuse', 'maritalconflict', 'humantrafficking',
         'boys_physicalviolence', 'girls_physicalviolence', 'men_physicalviolence', 'women_physicalviolence',
         'girls_defilement',
@@ -114,13 +114,31 @@ INDICATORS = {
 
     ],
     'cc': [
-        'month', 'attendance', 'violence', 'referred',
+        'month', 'year', 'attendance', 'violence', 'referred',
         'boys_attendance', 'girls_attendance',
         'boys_violence', 'girls_violence',
         'boys_referred', 'girls_referred',
         'men_trainedfacilitators', 'women_trainedfacilitators',
         'men_nontrainedfacilitators', 'women_nontrainedfacilitators',
         'trainedfacilitators', 'nontrainedfacilitators'
+    ],
+    'osc': [
+        'month', 'year', 'boys_physicalviolence', 'girls_physicalviolence', 'men_physicalviolence',
+        'women_physicalviolence', 'physicalviolence',
+        'boys_sexualviolence', 'girls_sexualviolence', 'men_sexualviolence',
+        'women_sexualviolence', 'sexualviolence', 'boys_psychosocialsupport',
+        'girls_psychosocialsupport', 'men_psychosocialsupport', 'women_psychosocialsupport', 'psychosocialsupport',
+        'male_perpetrators_physicalviolence', 'female_perpetrators_physicalviolence',
+        'male_perpetrators_sexualviolence', 'female_perpetrators_sexualviolence',
+        'parents_relation_physicalviolence', 'relatives_relation_physicalviolence',
+        'boygirlfriend_relation_physicalviolence', 'husbandwife_relation_physicalviolence',
+        'victimknows_relation_physicalviolence', 'strangers_relation_physicalviolence',
+        'parents_relation_sexualviolence', 'relatives_relation_sexualviolence',
+        'boygirlfriend_relation_sexualviolence', 'husbandwife_relation_sexualviolence',
+        'victimknows_relation_sexualviolence', 'strangers_relation_sexualviolence',
+        'referredfrom_self', 'referredfrom_socailwelfare', 'referredfrom_police',
+        'referredfrom_hospital', 'referredfrom_others', 'male_feltsafe', 'female_feltsafe',
+        'male_feltunsafe', 'female_feltunsafe'
     ]
 }
 
@@ -144,6 +162,9 @@ REPORT_AGGREGATE_INIDICATORS = {
     ],
     'cc': [
         'attendance', 'violence', 'referred'
+    ],
+    'osc': [
+        'physicalviolence', 'sexualviolence', 'psychosocialsupport', 'feltsafe', 'feltunsafe',
     ]
 }
 
@@ -211,6 +232,18 @@ INDICATOR_CATEGORY_MAPPING = {
         'trainedfacilitators': ['men', 'women'],
         'nontrainedfacilitators': ['men', 'women'],
 
+    },
+    'osc': {
+        'physicalviolence': ['boys', 'girls', 'men', 'women'],
+        'sexualviolence': ['boys', 'girls', 'men', 'women'],
+        'psychosocialsupport': ['boys', 'girls', 'men', 'women'],
+        'referredfrom': ['self', 'hospital', 'socialwelfare', 'police', 'others'],
+        'perpetrators_physicalvionce': ['male', 'female'],
+        'perpetrators_sexualviolence': ['male', 'female'],
+        'relation_physicalviolence': ['parents', 'relatives', 'boygirlfriend', 'husbandwife', 'victimknows', 'strangers'],
+        'relation_sexualviolence': ['parents', 'relatives', 'boygirlfriend', 'husbandwife', 'victimknows', 'strangers'],
+        'feltsafe': ['male', 'female'],
+        'feltunsafe': ['male', 'female'],
     }
 }
 
@@ -256,7 +289,16 @@ INDICATOR_THRESHOLD = {
     'violence': 70,
     'attendance': 150,
     'trainedfacilitators': 25,
-    'nontrainedfacilitators': 10
+    'nontrainedfacilitators': 10,
+    'sexualviolence': 40,
+    'psychosocialsupport': 30,
+    'feltsafe': 20,
+    'feltunsafe': 10,
+    'relation_sexualviolence': 35,
+    'relation_physicalviolence': 50,
+    'referredfrom': 45,
+    'perpetrators_physicalvionce': 27,
+    'perpetrators_sexualviolence': 15
 }
 # a mapping of flow variables to their readable description
 INDICATOR_NAME_MAPPING = {
@@ -284,6 +326,11 @@ INDICATOR_NAME_MAPPING = {
     'girls_total': 'Girls',
     'men_total': 'Men',
     'women_total': 'Women',
+    'referredfrom_self': 'Self, including brought from family',
+    'referredfrom_socailwelfare': 'Social Welfare',
+    'referredfrom_hospital': 'Hospital',
+    'referredfrom_police': 'Police',
+    'referredfrom_others': 'Others',
 
 }
 
