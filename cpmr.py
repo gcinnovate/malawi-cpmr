@@ -10,7 +10,7 @@ from app import create_app, db, redis_client
 from app.models import (
     Location, LocationTree, PoliceStation, User, Role,
     FlowData, JusticeCourt, SummaryCases, TraditionalAuthority,
-    CommunityVictimSupportUnit, ChildrensCorner)
+    CommunityVictimSupportUnit, ChildrensCorner, OneStopCenter)
 import datetime
 from flask import current_app
 from sqlalchemy.sql import text
