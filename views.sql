@@ -31,9 +31,13 @@ DROP VIEW IF EXISTS flow_data_pvsu_view_southern;
 DROP VIEW IF EXISTS flow_data_pvsu_view_northern;
 DROP VIEW IF EXISTS flow_data_pvsu_view_central;
 --
+DROP VIEW IF EXISTS osc_referredfrom_regional_view;
+DROP VIEW IF EXISTS osc_sexualviolence_demographics_regional_view;
+DROP VIEW IF EXISTS osc_physicalviolence_demographics_regional_view;
 DROP VIEW IF EXISTS cc_attendance_regional_view;
 DROP VIEW IF EXISTS cvsu_cases_demographics_regional_view;
 DROP VIEW IF EXISTS cvsu_casetypes_regional_view;
+DROP VIEW IF EXISTS flow_data_osc_view;
 DROP VIEW IF EXISTS flow_data_cvsu_view_all;
 DROP VIEW IF EXISTS flow_data_cvsu_view;
 DROP VIEW IF EXISTS ncjf_childvictim_cases_stats_view;
@@ -792,7 +796,7 @@ CREATE OR REPLACE VIEW flow_data_osc_view  AS
         (a.values->>'victimknows_relation_sexualviolence')::int victimknows_relation_sexualviolence,
         (a.values->>'strangers_relation_sexualviolence')::int strangers_relation_sexualviolence,
         (a.values->>'referredfrom_self')::int referredfrom_self,
-        (a.values->>'referredfrom_socailwelfare')::int referredfrom_socailwelfare,
+        (a.values->>'referredfrom_socialwelfare')::int referredfrom_socialwelfare,
         (a.values->>'referredfrom_police')::int referredfrom_police,
         (a.values->>'referredfrom_hospital')::int referredfrom_hospital,
         (a.values->>'referredfrom_others')::int referredfrom_others,
@@ -817,7 +821,39 @@ CREATE OR REPLACE VIEW flow_data_osc_view  AS
     WHERE
         a.report_type = 'osc';
 
+DROP VIEW IF EXISTS osc_sexualviolence_demographics_regional_view;
+CREATE VIEW osc_sexualviolence_demographics_regional_view AS
+    SELECT
+        sum(boys_sexualviolence) boys_total,
+        sum(girls_sexualviolence) girls_total,
+        sum(men_sexualviolence) men_total,
+        sum(women_sexualviolence) women_total,
+        month, year, region_id
+    FROM flow_data_osc_view
+    GROUP BY month, year, region_id;
 
+DROP VIEW IF EXISTS osc_physicalviolence_demographics_regional_view;
+CREATE VIEW osc_physicalviolence_demographics_regional_view AS
+    SELECT
+        sum(boys_physicalviolence) boys_total,
+        sum(girls_physicalviolence) girls_total,
+        sum(men_physicalviolence) men_total,
+        sum(women_physicalviolence) women_total,
+        month, year, region_id
+    FROM flow_data_osc_view
+    GROUP BY month, year, region_id;
+
+DROP VIEW IF EXISTS osc_referredfrom_regional_view;
+CREATE VIEW osc_referredfrom_regional_view AS
+    SELECT
+        sum(referredfrom_self) referredfrom_self,
+        sum(referredfrom_socialwelfare) referredfrom_socialwelfare,
+        sum(referredfrom_police) referredfrom_police,
+        sum(referredfrom_hospital) referredfrom_hospital,
+        sum(referredfrom_others) referredfrom_others,
+        month, year, region_id
+    FROM flow_data_osc_view
+    GROUP BY month, year, region_id;
 
 -- Create region level views to help with permissions
 DROP VIEW IF EXISTS flow_data_pvsu_view_eastern;

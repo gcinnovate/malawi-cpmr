@@ -165,6 +165,7 @@ REPORT_AGGREGATE_INIDICATORS = {
     ],
     'osc': [
         'physicalviolence', 'sexualviolence', 'psychosocialsupport', 'feltsafe', 'feltunsafe',
+        'referredfrom'
     ]
 }
 
@@ -327,7 +328,7 @@ INDICATOR_NAME_MAPPING = {
     'men_total': 'Men',
     'women_total': 'Women',
     'referredfrom_self': 'Self, including brought from family',
-    'referredfrom_socailwelfare': 'Social Welfare',
+    'referredfrom_socialwelfare': 'Social Welfare',
     'referredfrom_hospital': 'Hospital',
     'referredfrom_police': 'Police',
     'referredfrom_others': 'Others',
@@ -336,6 +337,7 @@ INDICATOR_NAME_MAPPING = {
 
 # Flow names that use a month generated from reporting date
 AUTO_MONTH_FLOWS = []
+INDICATORS_TO_SWAP_KEYVALS = ['referredfrom']
 try:
     from local_config import *
 except ImportError:

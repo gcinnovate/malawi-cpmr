@@ -15,7 +15,7 @@ import datetime
 from flask import current_app
 from sqlalchemy.sql import text
 from getpass import getpass
-from config import INDICATOR_NAME_MAPPING
+from config import INDICATOR_NAME_MAPPING, INDICATORS_TO_SWAP_KEYVALS
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
@@ -179,7 +179,10 @@ def load_test_data(report, start_year, end_year, start_month, end_month, init, l
                 for k, v in INDICATOR_CATEGORY_MAPPING.get(report).items():
                     indcators_total = 0
                     for ind in v:
-                        field = "{0}_{1}".format(ind, k)
+                        if k in INDICATORS_TO_SWAP_KEYVALS:
+                            field = "{0}_{1}".format(k, ind)
+                        else:
+                            field = "{0}_{1}".format(ind, k)
                         if init:
                             val = 0
                         else:
@@ -533,6 +536,87 @@ def refresh_pvsu_casetypes():
             s = SummaryCases(
                 casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
                 region=r[4], report_type='cc', summary_for='region', summary_slug='attendance')
+            db.session.add(s)
+        db.session.commit()
+
+    # Load data for osc regional demography -sexualviolece
+    results = db.engine.execute("SELECT * FROM osc_sexualviolence_demographics_regional_view order by year desc")
+    records = []
+    for row in results:
+        month = row['month']
+        year = row['year']
+        region_id = row['region_id']
+        for k in results.keys():
+            if k in ('month', 'year', 'region_id'):
+                continue
+            casetype, cases = (k, row[k])
+            records.append((casetype, cases, month, year, region_id))
+
+    print(records)
+    for r in records:
+        summary = SummaryCases.query.filter_by(
+            casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3], region=r[4],
+            report_type='osc', summary_for='region', summary_slug='demography-sexual').first()
+        if summary:
+            summary.value = r[1]
+        else:
+            s = SummaryCases(
+                casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
+                region=r[4], report_type='osc', summary_for='region', summary_slug='demography-sexual')
+            db.session.add(s)
+        db.session.commit()
+
+    # Load data for osc regional demography - physicalviolence
+    results = db.engine.execute("SELECT * FROM osc_physicalviolence_demographics_regional_view order by year desc")
+    records = []
+    for row in results:
+        month = row['month']
+        year = row['year']
+        region_id = row['region_id']
+        for k in results.keys():
+            if k in ('month', 'year', 'region_id'):
+                continue
+            casetype, cases = (k, row[k])
+            records.append((casetype, cases, month, year, region_id))
+
+    print(records)
+    for r in records:
+        summary = SummaryCases.query.filter_by(
+            casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3], region=r[4],
+            report_type='osc', summary_for='region', summary_slug='demography-physical').first()
+        if summary:
+            summary.value = r[1]
+        else:
+            s = SummaryCases(
+                casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
+                region=r[4], report_type='osc', summary_for='region', summary_slug='demography-physical')
+            db.session.add(s)
+        db.session.commit()
+
+    # Load data for osc regional referredfrom pie-chart data
+    results = db.engine.execute("SELECT * FROM osc_referredfrom_regional_view order by year desc")
+    records = []
+    for row in results:
+        month = row['month']
+        year = row['year']
+        region_id = row['region_id']
+        for k in results.keys():
+            if k in ('month', 'year', 'region_id'):
+                continue
+            casetype, cases = (k, row[k])
+            records.append((casetype, cases, month, year, region_id))
+
+    print(records)
+    for r in records:
+        summary = SummaryCases.query.filter_by(
+            casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), month=r[2], year=r[3], region=r[4],
+            report_type='osc', summary_for='region', summary_slug='referredfrom').first()
+        if summary:
+            summary.value = r[1]
+        else:
+            s = SummaryCases(
+                casetype=INDICATOR_NAME_MAPPING.get(r[0], r[0]), value=r[1], month=r[2], year=r[3],
+                region=r[4], report_type='osc', summary_for='region', summary_slug='referredfrom')
             db.session.add(s)
         db.session.commit()
 
