@@ -759,7 +759,7 @@ DROP VIEW IF EXISTS flow_data_osc_view;
 CREATE OR REPLACE VIEW flow_data_osc_view  AS
     SELECT
         a.month, a.year, a.report_type, a.msisdn,
-        "" AS nation,
+        '' AS nation,
         c.name AS region,
         c.id AS region_id,
         b.name AS district,
