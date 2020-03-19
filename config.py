@@ -239,7 +239,7 @@ INDICATOR_CATEGORY_MAPPING = {
         'sexualviolence': ['boys', 'girls', 'men', 'women'],
         'psychosocialsupport': ['boys', 'girls', 'men', 'women'],
         'referredfrom': ['self', 'hospital', 'socialwelfare', 'police', 'others'],
-        'perpetrators_physicalvionce': ['male', 'female'],
+        'perpetrators_physicalviolence': ['male', 'female'],
         'perpetrators_sexualviolence': ['male', 'female'],
         'relation_physicalviolence': ['parents', 'relatives', 'boygirlfriend', 'husbandwife', 'victimknows', 'strangers'],
         'relation_sexualviolence': ['parents', 'relatives', 'boygirlfriend', 'husbandwife', 'victimknows', 'strangers'],
@@ -298,7 +298,7 @@ INDICATOR_THRESHOLD = {
     'relation_sexualviolence': 35,
     'relation_physicalviolence': 50,
     'referredfrom': 45,
-    'perpetrators_physicalvionce': 27,
+    'perpetrators_physicalviolence': 27,
     'perpetrators_sexualviolence': 15
 }
 # a mapping of flow variables to their readable description
