@@ -672,8 +672,10 @@ def load_legacy_data(filename, report):
         # click.echo(data[:10])
         for d in data:
             values = {}
+            msisdn = ""
+            if report in ('ncjf'):
+                msisdn = d[2].strip()
             for idx, v in enumerate(d):
-                msisdn = ""
                 if idx == 0:
                     if report in ('pvsu', 'diversion'):
                         reporting_month = d[0].split(' ')[0]
@@ -728,8 +730,14 @@ def load_legacy_data(filename, report):
                 if report in ('ncjf'):
                     flow_data_obj.msisdn = msisdn
                     flow_data_obj.updated = datetime.datetime.now()
-                print("XXXXXXXXX=>", flow_data_obj.id, flow_data_obj.year)
+                print(">>", msisdn, "<<", "XXXXXXXXX=>", flow_data_obj.id, flow_data_obj.year, flow_data_obj.msisdn)
                 db.session.commit()
+            else:
+                if report in ('ncjf'):
+                    db.session.add(FlowData(
+                        region=region, district=district, court=court, month=month,
+                        year=year, report_type=report, msisdn=msisdn, values=values))
+                    db.session.commit()
 
 
 @app.cli.command("load_legacy_data2")
