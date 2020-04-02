@@ -725,6 +725,12 @@ CREATE VIEW flow_data_cc_view AS
         (a.values->>'men_nontrainedfacilitators')::int men_nontrainedfacilitators,
         (a.values->>'women_nontrainedfacilitators')::int women_nontrainedfacilitators,
         (a.values->>'nontrainedfacilitators')::int nontrainedfacilitators,
+        (a.values->>'socialwelfare_referredto')::int socialwelfare_referredto,
+        (a.values->>'police_referredto')::int police_referredto,
+        (a.values->>'judiciary_referredto')::int judiciary_referredto,
+        (a.values->>'hospital_referredto')::int hospital_referredto,
+        (a.values->>'osc_referredto')::int osc_referredto,
+        (a.values->>'other_referredto')::int other_referredto,
         created,
         CASE
             WHEN a.month ~ '(0[13578]|1[02])$' THEN

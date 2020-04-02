@@ -120,7 +120,9 @@ INDICATORS = {
         'boys_referred', 'girls_referred',
         'men_trainedfacilitators', 'women_trainedfacilitators',
         'men_nontrainedfacilitators', 'women_nontrainedfacilitators',
-        'trainedfacilitators', 'nontrainedfacilitators'
+        'trainedfacilitators', 'nontrainedfacilitators',
+        'socialwelfare_referredto', 'police_referredto', 'judiciary_referredto',
+        'hospital_referredto', 'osc_referredto', 'other_referredto'
     ],
     'osc': [
         'month', 'year', 'boys_physicalviolence', 'girls_physicalviolence', 'men_physicalviolence',
@@ -232,6 +234,7 @@ INDICATOR_CATEGORY_MAPPING = {
         'referred': ['boys', 'girls'],
         'trainedfacilitators': ['men', 'women'],
         'nontrainedfacilitators': ['men', 'women'],
+        'referredto': ['socialwelfare', 'police', 'judiciary', 'hospital', 'osc', 'other']
 
     },
     'osc': {
