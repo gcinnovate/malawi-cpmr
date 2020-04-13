@@ -53,6 +53,9 @@ DROP VIEW IF EXISTS pvsu_casetypes_regional_view;
 DROP VIEW IF EXISTS pvsu_cases_demographics_regional_view;
 DROP VIEW IF EXISTS flow_data_pvsu_view;
 DROP VIEW IF EXISTS flow_data_diversion_view;
+
+DROP VIEW IF EXISTS flow_data_view;
+
 -- view for all pvsu data
 CREATE OR REPLACE VIEW flow_data_pvsu_view  AS
     SELECT
@@ -1038,4 +1041,32 @@ DROP VIEW IF EXISTS diversion_data_view_central;
 CREATE VIEW diversion_data_view_central AS
     SELECT * FROM diversion_data_view WHERE region = 'Central';
 
-
+-- View used for the Report Breakdown dashboard
+DROP VIEW IF EXISTS flow_data_view;
+CREATE OR REPLACE VIEW flow_data_view  AS
+ SELECT a.month,
+    a.year,
+	a.created,
+	a.updated,
+    a.report_type,
+    c.name AS region,
+    b.name AS district,
+    c.id AS region_id,
+    d.name AS childrens_corner,
+	f.name AS cvsu,
+	g.name AS police_station,
+	h.name AS court,
+    i.name AS one_stop_center,
+    e.name AS ta,
+    (b.longitude)::numeric AS longitude,
+    (b.latitude)::numeric AS latitude,
+    'Malawi'::text AS nation
+   FROM flow_data a
+     LEFT JOIN locations b ON ((a.district = b.id))
+     LEFT JOIN locations c ON ((a.region = c.id))
+     LEFT JOIN childrens_corners d ON ((a.children_corner = d.id))
+     LEFT JOIN traditional_authorities e ON ((d.ta_id = e.id))
+     LEFT JOIN community_victim_support_units f ON ((a.cvsu = f.id))
+	 LEFT JOIN police_stations g ON ((a.station = g.id))
+	 LEFT JOIN justice_courts h ON ((a.court = h.id))
+     LEFT JOIN one_stop_centers i ON ((a.one_stop_center = i.id));
