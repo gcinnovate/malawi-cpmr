@@ -20,7 +20,7 @@ importlib-metadata==0.18
 itsdangerous==1.1.0
 Jinja2==2.10.1
 kombu==4.6.3
-Mako==1.0.13
+Mako==1.2.2
 MarkupSafe==1.1.1
 migrate==0.3.8
 more-itertools==7.1.0
