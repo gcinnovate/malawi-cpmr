@@ -40,5 +40,5 @@ SQLAlchemy==1.3.5
 sqlalchemy-mptt==0.2.4
 vine==1.3.0
 wcwidth==0.1.7
-Werkzeug==0.15.4
+Werkzeug==0.15.5
 zipp==0.5.2
